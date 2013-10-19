@@ -34,9 +34,16 @@ int main(int argc, char *argv[])
 	if (newsockfd < 0)
 		error("ERROR on accept");
 
-	if (read(newsockfd, recv_struct, sizeof(*recv_struct)) < 0)
-		error("ERROR reading from socket");
+	while(1) {
+		if (read(newsockfd, recv_struct, sizeof(*recv_struct)) < 0)
+			error("ERROR reading from socket");
+		
+		recv_struct->a += 2;
+		recv_struct->b += 2;
 	
-	printf("Here is the struct: %d %d\n", recv_struct->a, recv_struct->b);
+		if (write(newsockfd, recv_struct, sizeof(*recv_struct)) < 0)
+    		error("ERROR writing to socket");
+	}
+	printf("here");
 	return 0; 
 }

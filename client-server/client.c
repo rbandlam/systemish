@@ -6,10 +6,11 @@ void error(char *msg)
 	exit(0);
 }
 
-//Usage: ./client <server_ip>
+//Usage: ./client <server_ip> <num-messages>
 int main(int argc, char *argv[])
 {
 	int sockfd;
+	int num_messages = atoi(argv[2]), i = 0;
 
 	struct sockaddr_in serv_addr;
 	struct hostent *server;
@@ -17,8 +18,6 @@ int main(int argc, char *argv[])
 	struct my_struct *send_struct;
 	send_struct = malloc(sizeof(*send_struct));	
 	memset(send_struct, 0, sizeof(*send_struct));
-	send_struct->a = 3185;
-	send_struct->b = 3187;
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) 
@@ -38,7 +37,19 @@ int main(int argc, char *argv[])
 	if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
 		error("ERROR connecting");
 
-	if (write(sockfd, send_struct, sizeof(*send_struct)) < 0)
-    	error("ERROR writing to socket");
+	for(i=0; i < num_messages; i++) {
+		send_struct->a = i;
+		send_struct->b = i + 1;
+		
+		// Send a request to server
+		if (write(sockfd, send_struct, sizeof(*send_struct)) < 0)
+    		error("ERROR writing to socket");
+		//printf("Client sent request: %d %d\n", send_struct->a, send_struct->b);	
+
+		// Get a response
+		if (read(sockfd, send_struct, sizeof(*send_struct)) < 0)
+			error("ERROR reading from socket");
+		//printf("Client received response: %d %d\n", send_struct->a, send_struct->b);	
+	}
 	return 0;
 }
