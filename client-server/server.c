@@ -12,9 +12,11 @@ int main(int argc, char *argv[])
 	int sockfd, newsockfd;
 	struct sockaddr_in serv_addr;
 
-	struct my_struct *recv_struct;
-	recv_struct = malloc(sizeof(*recv_struct));
-	memset(recv_struct, 0 , sizeof(*recv_struct));
+	struct my_struct *send_struct;
+	send_struct = malloc(sizeof(*send_struct));
+	memset(send_struct, 0 , sizeof(*send_struct));
+	send_struct->a = 3185;
+	send_struct->b = 3187;
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0)
@@ -28,22 +30,22 @@ int main(int argc, char *argv[])
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 		error("ERROR on binding");
 
-	listen(sockfd, 5);
-
-	newsockfd = accept(sockfd, NULL, NULL);
-	if (newsockfd < 0)
-		error("ERROR on accept");
-
-	while(1) {
-		if (read(newsockfd, recv_struct, sizeof(*recv_struct)) < 0)
-			error("ERROR reading from socket");
-		
-		recv_struct->a += 2;
-		recv_struct->b += 2;
+	printf("Server listening...\n");
 	
-		if (write(newsockfd, recv_struct, sizeof(*recv_struct)) < 0)
-    		error("ERROR writing to socket");
+	while(1) {
+		listen(sockfd, 5);
+	
+		newsockfd = accept(sockfd, NULL, NULL);
+		if (newsockfd < 0)
+			error("ERROR on accept");
+		
+		printf("Server: write() in 5 seconds\n");
+		sleep(5);
+		printf("Server: write()!\n");
+		if (write(newsockfd, send_struct, sizeof(*send_struct)) < 0)
+			error("ERROR writing to socket");
+	
+		printf("Server done!");
 	}
-	printf("here");
 	return 0; 
 }
