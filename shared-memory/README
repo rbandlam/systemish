@@ -1,0 +1,7 @@
+A simple shared memory client-server setup. The server creates a shared memory region and
+starts writing to it. The server "lights the beacon" after it has written to the value.
+The client reads the beacon to check if the corresponding value is valid.
+
+Assumptions:
+1. Memory operations are atomic.
+2. Memory operations are oredered.
