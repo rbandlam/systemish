@@ -1,0 +1,5 @@
+A shared integer between a wwiter and a reader.
+The writer always writes an integer which is 0 modulo 31. The reader checks
+this property.
+
+Can we conclude that 32 bit, normally aligned memory accesses are atomic?
