@@ -1,2 +1,2 @@
 all:
-	gcc -O3 -o spinlock spinlock.c -lpthread -lrt
+	gcc -O2 -o spinlock spinlock.c -lpthread -lrt

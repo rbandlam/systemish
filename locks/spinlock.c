@@ -6,41 +6,85 @@
 #include<stdlib.h>
 #include<pthread.h>
 
-void *counter_incrementer_function(void *ptr);
+#define SIZE 1048576
+#define SIZE_ 1048575
+#define NUM_THREADS 16
+#define NUM_MACHINES 4
 
-//A counter and a mutex to spinlock it
-int counter = 0;
-int MAX = 5000000;
-pthread_spinlock_t counter_spinlock;
+#define FENCE asm volatile ("" : : : "memory"); \
+	asm volatile("mfence" ::: "memory")
+
+#define NANO 1000000000
+
+struct KV {
+	long long location;
+	long long value;
+	long long req_num;
+	long long key;
+};
+
+struct CC {
+	pthread_spinlock_t lock;
+	int index;
+	long long pad[7];
+};
+
+void *kv_function(void *ptr);
+
+struct KV *kv_array[NUM_MACHINES];
+struct CC cc_array[NUM_MACHINES];
+
+struct timespec start[NUM_MACHINES], end[NUM_MACHINES];
 
 main()
 {
-	pthread_t thread1, thread2, thread3, thread4;
-	pthread_spin_init(&counter_spinlock, 0);
+	printf("%lu %lu\n", sizeof(struct CC), sizeof(pthread_spinlock_t));
+	int i;
+	for(i = 0; i < NUM_MACHINES; i++) {
+		kv_array[i] = (struct KV*) malloc(SIZE * sizeof(struct KV));
+		cc_array[i].index = 0;
+		pthread_spin_init(&cc_array[i].lock, 0);
+	}
+	
+	int tid[NUM_THREADS];
+	pthread_t thread[NUM_THREADS];
+	
+	for(i = 0; i < NUM_THREADS; i++) {
+		tid[i] = i;
+		pthread_create(&thread[i], NULL, kv_function, &tid[i]);
+	}
 
-	pthread_create(&thread1, NULL, counter_incrementer_function, NULL);
-	pthread_create(&thread2, NULL, counter_incrementer_function, NULL);
-	pthread_create(&thread3, NULL, counter_incrementer_function, NULL);
-	pthread_create(&thread4, NULL, counter_incrementer_function, NULL);
+	for(i = 0; i < NUM_THREADS; i++) {
+		pthread_join(thread[i], NULL);
+	}
 
-	pthread_join(thread1, NULL);
-	pthread_join(thread2, NULL);
-	pthread_join(thread3, NULL);
-	pthread_join(thread4, NULL);
-
-	printf("Counter = %d \n", counter);
 	exit(0);
 }
 
-void *counter_incrementer_function( void *ptr)
+void *kv_function( void *ptr)
 {
-	int i;
-	for(i = 0; i < MAX; i++) {
-		pthread_spin_lock(&counter_spinlock);
-		counter++;
-		if(counter % 1000000 == 0) {
-			printf("%d\n", counter);
-		}
-		pthread_spin_unlock(&counter_spinlock);
+	int tid = *((int *) ptr);
+	int mid = tid % NUM_MACHINES;
+	printf("Starting tid: %d, mid: %d\n", tid, mid);
+
+	while(1) {
+		pthread_spin_lock(&cc_array[mid].lock);
+			if(cc_array[mid].index == 0) {
+				// This scheme works because end and start are global variables.
+				// One thread can capture "start" and another the corresponding
+				// "end". That is fine.
+				clock_gettime(CLOCK_REALTIME, &end[mid]);
+				double seconds = (end[mid].tv_sec - start[mid].tv_sec) + 
+					((double) (end[mid].tv_nsec - start[mid].tv_nsec) / NANO);
+				printf("Machine %d, OPS = %f\n", mid, 1000000 / seconds);
+				clock_gettime(CLOCK_REALTIME, &start[mid]);
+			}
+			/*kv_array[mid][kv_index[mid]].key = kv_index[mid] + 1;
+			kv_array[mid][kv_index[mid]].location = kv_index[mid] + 2;
+			kv_array[mid][kv_index[mid]].req_num = kv_index[mid] + 3;
+			FENCE;
+			kv_array[mid][kv_index[mid]].value = kv_index[mid] + 4;*/
+			cc_array[mid].index = (cc_array[mid].index + 1) & SIZE_;
+		pthread_spin_unlock(&cc_array[mid].lock);
 	}
 }
