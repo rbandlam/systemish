@@ -1,0 +1,4 @@
+./spinlock &
+./spinlock &
+./spinlock &
+./spinlock &
