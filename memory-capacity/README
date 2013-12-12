@@ -1,0 +1,8 @@
+This is a setup to measure memory capacity.
+
+Each process allocates a huge array on the core it is allowed to run.
+
+At 16 processes, each process pulls out over 2.5 operations per second
+(each operation consists of 2 random reads).
+
+
