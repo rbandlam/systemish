@@ -1,0 +1,9 @@
+This is a demonstration program for masking DRAM latency with 
+RAM prefetching.
+
+We allocate a large array A and a smaller array of random indices
+into that array. Later, we wish to do some processing with each element
+of A indexed by the indices array.
+
+Before we process an element of A, we issue a prefetch for the next
+element of A that will get processed.
