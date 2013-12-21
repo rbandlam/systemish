@@ -1,1 +1,2 @@
 killall spinlock
+killall manylock

@@ -2,3 +2,15 @@
 ./spinlock &
 ./spinlock &
 ./spinlock &
+./spinlock &
+./spinlock &
+./spinlock &
+./spinlock &
+./spinlock &
+./spinlock &
+./spinlock &
+./spinlock &
+./spinlock &
+./spinlock &
+./spinlock &
+./spinlock &

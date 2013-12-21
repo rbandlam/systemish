@@ -8,8 +8,8 @@
 
 #define SIZE 1048576
 #define SIZE_ 1048575
-#define NUM_THREADS 16
-#define NUM_MACHINES 4
+#define NUM_THREADS 4
+#define NUM_MACHINES 1
 
 #define FENCE asm volatile ("" : : : "memory"); \
 	asm volatile("mfence" ::: "memory")
