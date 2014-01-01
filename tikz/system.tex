@@ -1,12 +1,23 @@
 \documentclass{article}
-\usepackage{tikz}
+
 \usepackage[landscape]{geometry}
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+
+%\usetikzlibrary{shapes, geometric, arrows}
+
+\tikzstyle{machine} = [rectangle, minimum width = 6cm, minimum height = 8cm, 
+	text centered, ultra thick, draw = black]
+\tikzstyle{arrow} = [ultra thick, ->]	
 
 \begin{document}
+\begin{tikzpicture}[node distance = 8cm]
 
-\begin{tikzpicture}[scale=3]
-	\draw [help lines] (0,0) grid (2,3);
-	\draw [|->, ultra thick] (0,0) -- (1,2) -- (2,3) -- (1,0);
+\node (server) [machine] {};
+\node (client) [machine, right of = server, xshift = 4cm, 
+	label = below:\Huge $b_1$] {};
+
+\draw [arrow] (server) -- (client);
+
 \end{tikzpicture}
-
 \end{document}
