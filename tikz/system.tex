@@ -6,56 +6,42 @@
 
 %\usetikzlibrary{shapes, geometric, arrows}
 
-\tikzstyle{process} = [rectangle, minimum width = 1.5cm, minimum height = 1cm, 
+\tikzstyle{process} = [rectangle, minimum width = 2.5cm, minimum height = 1cm, 
 	text centered, ultra thick, draw = black]
-\tikzstyle{arrow} = [ultra thick, ->]	
+\tikzstyle{arrow} = [ultra thick, ->]
 
 \begin{document}
-\begin{tikzpicture}[node distance = 12cm]
+\begin{tikzpicture}[node distance = 10cm]
 
 \node (M0) [matrix, draw = black, very thick, 
-	inner sep = 5mm, row sep = 3mm, column sep = 3mm, 
+	inner sep = 2mm, row sep = 2mm, column sep = 2mm, 
 	label = below:\huge $M_0$]
 {
-	\node (M00) [process] {\large Core 0}; & 
-	\node (M01) [process] {\large Core 1}; &
-	[1cm]\\
+	\node (M00) [process, fill = blue!50] {\large Core 0}; \\
 
-	\node (M02) [process] {\large Core 2}; & 
-	\node (M03) [process] {\large Core 3}; &
-	[1cm]\\
+	\node (M01) [process] {\large Core 1}; \\[1cm]
 
-	\node (M04) [process] {\large Core 4}; & 
-	\node (M05) [process] {\large Core 5}; &
-	[1cm]\\
+	\node (M0N) [process] {\large Core N}; \\[1cm]
 
-	\node (M06) [process] {\large Core 6}; & 
-	\node (M07) [process] {\large Core 7}; &
-	[1cm]\\
+	\node (M016) [process] {\large Core 16}; \\
 };
 
+\draw [dotted, very thick] (M01) -- (M0N);
+\draw [dotted, very thick] (M0N) -- (M016);
 
 \node (M1) [matrix, draw = black, very thick, right of = M0, 
-	inner sep = 5mm, row sep = 3mm, column sep = 3mm, 
+	inner sep = 2mm, row sep = 2mm, column sep = 2mm, 
 	label = below:\huge $M_1$]
 {
-	\node (M10) [process] {\large Core 0}; & 
-	\node (M11) [process] {\large Core 1}; &
-	[1cm]\\
+	\node (M10) [process, fill = blue!50] {\large Core 0}; \\
 
-	\node (M12) [process] {\large Core 2}; & 
-	\node (M13) [process] {\large Core 3}; &
-	[1cm]\\
+	\node (M11) [process] {\large Core 1}; \\[1cm]
 
-	\node (M14) [process] {\large Core 4}; & 
-	\node (M15) [process] {\large Core 5}; &
-	[1cm]\\
+	\node (M1N) [process] {\large Core N}; \\[1cm]
 
-	\node (M16) [process] {\large Core 6}; & 
-	\node (M17) [process] {\large Core 7}; &
-	[1cm]\\
+	\node (M116) [process] {\large Core 16}; \\
 };
 
-\draw [arrow] (M00) -- (M1);
+\draw [arrow] (M00) -- (M10);
 \end{tikzpicture}
 \end{document}
