@@ -6,18 +6,34 @@
 
 %\usetikzlibrary{shapes, geometric, arrows}
 
-\tikzstyle{machine} = [rectangle, minimum width = 6cm, minimum height = 8cm, 
+\tikzstyle{process} = [rectangle, minimum width = 1.5cm, minimum height = 1cm, 
 	text centered, ultra thick, draw = black]
 \tikzstyle{arrow} = [ultra thick, ->]	
 
 \begin{document}
 \begin{tikzpicture}[node distance = 8cm]
 
-\node (server) [machine] {};
-\node (client) [machine, right of = server, xshift = 4cm, 
-	label = below:\Huge $b_1$] {};
+\node [matrix, draw = black, very thick, 
+	inner sep = 5mm, row sep = 3mm, column sep = 3mm, 
+	label = below:\huge $M_0$]
+{
+	\node (server0) [process] {\large Core 0}; & 
+	\node (server1) [process] {\large Core 1}; &
+	[1cm]\\
 
-\draw [arrow] (server) -- (client);
+	\node (server2) [process] {\large Core 2}; & 
+	\node (server3) [process] {\large Core 3}; &
+	[1cm]\\
+
+	\node (server4) [process] {\large Core 4}; & 
+	\node (server5) [process] {\large Core 5}; &
+	[1cm]\\
+
+	\node (server6) [process] {\large Core 6}; & 
+	\node (server7) [process] {\large Core 7}; &
+	[1cm]\\
+};
+
 
 \end{tikzpicture}
 \end{document}
