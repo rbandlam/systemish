@@ -11,29 +11,51 @@
 \tikzstyle{arrow} = [ultra thick, ->]	
 
 \begin{document}
-\begin{tikzpicture}[node distance = 8cm]
+\begin{tikzpicture}[node distance = 12cm]
 
-\node [matrix, draw = black, very thick, 
+\node (M0) [matrix, draw = black, very thick, 
 	inner sep = 5mm, row sep = 3mm, column sep = 3mm, 
 	label = below:\huge $M_0$]
 {
-	\node (server0) [process] {\large Core 0}; & 
-	\node (server1) [process] {\large Core 1}; &
+	\node (M00) [process] {\large Core 0}; & 
+	\node (M01) [process] {\large Core 1}; &
 	[1cm]\\
 
-	\node (server2) [process] {\large Core 2}; & 
-	\node (server3) [process] {\large Core 3}; &
+	\node (M02) [process] {\large Core 2}; & 
+	\node (M03) [process] {\large Core 3}; &
 	[1cm]\\
 
-	\node (server4) [process] {\large Core 4}; & 
-	\node (server5) [process] {\large Core 5}; &
+	\node (M04) [process] {\large Core 4}; & 
+	\node (M05) [process] {\large Core 5}; &
 	[1cm]\\
 
-	\node (server6) [process] {\large Core 6}; & 
-	\node (server7) [process] {\large Core 7}; &
+	\node (M06) [process] {\large Core 6}; & 
+	\node (M07) [process] {\large Core 7}; &
 	[1cm]\\
 };
 
 
+\node (M1) [matrix, draw = black, very thick, right of = M0, 
+	inner sep = 5mm, row sep = 3mm, column sep = 3mm, 
+	label = below:\huge $M_1$]
+{
+	\node (M10) [process] {\large Core 0}; & 
+	\node (M11) [process] {\large Core 1}; &
+	[1cm]\\
+
+	\node (M12) [process] {\large Core 2}; & 
+	\node (M13) [process] {\large Core 3}; &
+	[1cm]\\
+
+	\node (M14) [process] {\large Core 4}; & 
+	\node (M15) [process] {\large Core 5}; &
+	[1cm]\\
+
+	\node (M16) [process] {\large Core 6}; & 
+	\node (M17) [process] {\large Core 7}; &
+	[1cm]\\
+};
+
+\draw [arrow] (M00) -- (M1);
 \end{tikzpicture}
 \end{document}
