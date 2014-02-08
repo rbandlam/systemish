@@ -7,3 +7,5 @@ of A indexed by the indices array.
 
 Before we process an element of A, we issue a prefetch for the next
 element of A that will get processed.
+
+Running: ./prefetch <0/1>
