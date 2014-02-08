@@ -12,6 +12,7 @@ struct timespec start, end;
 
 void init_array()
 {
+	srand(41);
 	printf("Initializing %d bytes\n", SIZE);
 	A = malloc(SIZE);
 	for(i = 0; i < SIZE; i++) {
