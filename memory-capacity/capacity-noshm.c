@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<time.h>
 
 #define SIZE 1073741824
 #define SIZE_ 1073741823
