@@ -39,7 +39,7 @@
 #define M_2048_ 2147483647
 
 // The interesting stuff
-#define CAP M_64			//Capacity, in Integers
-#define CAP_ M_64_
+#define CAP M_128			//Capacity, in Integers
+#define CAP_ M_128_
 
 #define NUM_LOOKUPS M_64

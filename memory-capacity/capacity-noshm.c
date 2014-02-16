@@ -5,11 +5,11 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-#define SIZE 1073741824
-#define SIZE_ 1073741823
+#define SIZE 268435456
+#define SIZE_ 268435455
 
 #define M_64 67108864
-#define BATCH_SIZE 64
+#define BATCH_SIZE 8
 
 int i;
 char *A;

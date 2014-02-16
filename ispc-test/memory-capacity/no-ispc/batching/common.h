@@ -43,4 +43,4 @@
 #define CAP_ M_128_
 
 #define NUM_LOOKUPS M_64
-#define BATCH_SIZE 8
+#define BATCH_SIZE 32
