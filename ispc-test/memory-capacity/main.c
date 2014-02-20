@@ -10,7 +10,7 @@
 #define BATCH_SIZE 32
 
 int i;
-int *A, *B;
+int *A;
 struct timespec start, end;
 
 void init_array()
@@ -23,14 +23,10 @@ void init_array()
 	}
 
 	A = (int *) shmat(shm_id, 0, 0);
-	B = (int *) malloc(NUM_LOOKUPS * sizeof(int));
 
 	srand(41);
 	for(i = 0; i < CAP; i++) {
-		A[i] = rand();
-	}
-	for(i = 0; i < NUM_LOOKUPS; i++) {
-		B[i] = rand() & CAP_;
+		A[i] = rand() & CAP_;
 	}
 	
 	printf("Done initializing\n");
@@ -57,16 +53,9 @@ int main(int argc, char **argv)
 	init_array();
 	start_timer();
 	
-	int sum[BATCH_SIZE], total_sum = 0;
-	memset(sum, 0, BATCH_SIZE * sizeof(int));
-	
-	simple(A, B, sum);
+	simple(A);
 
-	for(j = 0; j < BATCH_SIZE; j++) {
-		total_sum += sum[j];
-	}
-
-	printf("Total Sum = %d\n", total_sum);	
+	printf("A[0] = %d\n", A[0]);	
 
 	end_timer();
 }
