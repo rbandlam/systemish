@@ -39,7 +39,7 @@
 #define M_2048_ 2147483647
 
 // Shared between main.c and main.ispc
-#define BATCH_SIZE 8
+#define BATCH_SIZE 16
 #define CAP M_128			//Capacity, in Integers
 #define CAP_ M_128_
 
