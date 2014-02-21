@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 	
 	int total_sum, addr = A[0];
 
-	for(i = 0; i < NUM_LOOKUPS; i ++) {
+	for(i = 0; i < DEREF_LENGTH; i ++) {
 		total_sum += A[addr];
 		addr = (A[addr] + i) & CAP_;
 	}

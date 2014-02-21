@@ -7,8 +7,6 @@
 
 #include "common.h"
 
-#define BATCH_SIZE 32
-
 int i;
 int *A;
 struct timespec start, end;
@@ -50,12 +48,16 @@ void end_timer()
 int main(int argc, char **argv)
 {
 	int j;
+	int sum[BATCH_SIZE];
+	memset(sum, 0, BATCH_SIZE * sizeof(int));
 	init_array();
 	start_timer();
 	
-	simple(A);
+	simple(A, sum);
 
-	printf("A[0] = %d\n", A[0]);	
+	for(j = 0; j < BATCH_SIZE; j++) {
+		printf("sum[%d] = %d\n", j, sum[j]);
+	}
 
 	end_timer();
 }
