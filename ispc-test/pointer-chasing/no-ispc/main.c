@@ -6,17 +6,10 @@
 #include <sys/shm.h>
 #include "common.h"
 
-#define CAP M_128			//Capacity, in Integers
-#define CAP_ M_128_
-
-#define NUM_LOOKUPS M_64
-
 int i;
-int *A;
+int *data_arr, *pkt_arr;
 struct timespec start, end;
 
-// Initialize a large "data" array A and a smaller "index" array B
-// As B is accessed sequentially, we don't use hugepages for it
 void init_array()
 {
 	printf("Initializing %lu bytes\n", CAP * sizeof(int));
@@ -27,11 +20,13 @@ void init_array()
 		exit(0);
 	}
 
-	A = (int *) shmat(shm_id, 0, 0);
+	data_arr = (int *) shmat(shm_id, 0, 0);
+	pkt_arr = (int *) malloc(NUM_PACKETS * sizeof(int));
+	memset(pkt_arr, 0, NUM_PACKETS * sizeof(int));
 
 	srand(41);
 	for(i = 0; i < CAP; i++) {
-		A[i] = rand() & CAP_;
+		data_arr[i] = rand() & CAP_;
 	}
 
 	printf("Done initializing\n");
@@ -54,18 +49,23 @@ void end_timer()
 
 int main(int argc, char **argv)
 {
-	int i, j;
+	int pkt_i, batch_i, i, j;
 	init_array();
 	start_timer();
 	
-	int total_sum, addr = A[0];
+	for(pkt_i = 0; pkt_i < NUM_PACKETS; pkt_i += BATCH_SIZE) {
+		for(batch_i = 0; batch_i < BATCH_SIZE; batch_i ++) {
+			int i = pkt_i + batch_i;
+			int addr = data_arr[i & CAP_];		// Sequential access into data_arr
 
-	for(i = 0; i < DEREF_LENGTH; i ++) {
-		total_sum += A[addr];
-		addr = (A[addr] + i) & CAP_;
+			for(j = 0; j < LOOKUPS_PER_PACKET; j ++) {
+				pkt_arr[i] += data_arr[addr];
+				addr = (data_arr[addr] + j) & CAP_;
+			}
+		}
 	}
 
-	printf("Total Sum = %d\n", total_sum);	
-
 	end_timer();
+	
+	printf("Random sample from pkt_arr: %d\n", pkt_arr[rand() % NUM_PACKETS]);
 }

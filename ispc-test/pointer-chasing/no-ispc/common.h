@@ -38,9 +38,9 @@
 #define M_2048 2147483648
 #define M_2048_ 2147483647
 
-// Shared between main.c and main.ispc
-#define BATCH_SIZE 16
 #define CAP M_128			//Capacity, in Integers
 #define CAP_ M_128_
 
-#define DEREF_LENGTH M_4
+#define NUM_PACKETS M_1
+#define LOOKUPS_PER_PACKET 64
+#define BATCH_SIZE 16
