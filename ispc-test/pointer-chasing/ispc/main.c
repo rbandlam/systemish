@@ -8,25 +8,28 @@
 #include "common.h"
 
 int i;
-int *A;
+int *data_arr, *pkt_arr;
 struct timespec start, end;
 
 void init_array()
 {
 	printf("Initializing %lu bytes\n", CAP * sizeof(int));
 	int shm_id = shmget(3185, CAP * sizeof(int), IPC_CREAT | 0666 | SHM_HUGETLB);
+
 	if(shm_id == -1) {
 		fprintf(stderr, "shmget Error! Failed to create array\n");
 		exit(0);
 	}
 
-	A = (int *) shmat(shm_id, 0, 0);
+	data_arr = (int *) shmat(shm_id, 0, 0);
+	pkt_arr = (int *) malloc(NUM_PACKETS * sizeof(int));
+	memset(pkt_arr, 0, NUM_PACKETS * sizeof(int));
 
 	srand(41);
 	for(i = 0; i < CAP; i++) {
-		A[i] = rand() & CAP_;
+		data_arr[i] = rand() & CAP_;
 	}
-	
+
 	printf("Done initializing\n");
 }
 
@@ -47,17 +50,15 @@ void end_timer()
 
 int main(int argc, char **argv)
 {
-	int j;
-	int sum[BATCH_SIZE];
-	memset(sum, 0, BATCH_SIZE * sizeof(int));
+	int pkt_i;
 	init_array();
 	start_timer();
 	
-	simple(A, sum);
-
-	for(j = 0; j < BATCH_SIZE; j++) {
-		printf("sum[%d] = %d\n", j, sum[j]);
+	for(pkt_i = 0; pkt_i < NUM_PACKETS; pkt_i += BATCH_SIZE) {
+		simple(data_arr, pkt_arr, pkt_i);
 	}
 
 	end_timer();
+	
+	printf("Random sample from pkt_arr: %d\n", pkt_arr[rand() % NUM_PACKETS]);
 }
