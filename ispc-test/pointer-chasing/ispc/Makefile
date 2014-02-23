@@ -1,12 +1,11 @@
 CXX=clang -m64
-CXXFLAGS=-Iobjs/ -O3 -Wall -lrt -g
+CXXFLAGS=-Iobjs/ -O3 -Wall -lrt
 ISPC=ispc
 ISPCFLAGS=-O2 --arch=x86-64 --target=avx
 
 default: main
 
 .PHONY: dirs clean
-.PRECIOUS: objs/main.h
 
 dirs:
 	/bin/mkdir -p objs/

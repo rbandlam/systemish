@@ -49,18 +49,22 @@ void end_timer()
 
 int main(int argc, char **argv)
 {
-	int pkt_i, batch_i, i, j;
+	int pkt_i, batch_i, i, j, k;
 	init_array();
 	start_timer();
 	
-	for(pkt_i = 0; pkt_i < NUM_PACKETS; pkt_i += BATCH_SIZE) {
-		for(batch_i = 0; batch_i < BATCH_SIZE; batch_i ++) {
-			int i = pkt_i + batch_i;
-			int addr = data_arr[i & CAP_];		// Sequential access into data_arr
+	for(pkt_i = 0; pkt_i < NUM_PACKETS; pkt_i += 1) {
+		i = pkt_i;
+		int addr = data_arr[i & CAP_];		// Sequential access into data_arr
 
-			for(j = 0; j < LOOKUPS_PER_PACKET; j ++) {
-				pkt_arr[i] += data_arr[addr];
-				addr = (data_arr[addr] + j) & CAP_;
+		for(j = 0; j < LOOKUPS_PER_PACKET; j ++) {
+			// Memory access
+			addr = data_arr[addr];
+			pkt_arr[i] += addr;
+
+			// Computation
+			for(k = 0; k < NUM_COMPUTE_STEPS; k++) {
+				addr = (addr + addr + k) & CAP_;
 			}
 		}
 	}

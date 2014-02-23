@@ -41,6 +41,9 @@
 #define CAP M_128			//Capacity, in Integers
 #define CAP_ M_128_
 
-#define NUM_PACKETS M_1
-#define LOOKUPS_PER_PACKET 64
+#define NUM_PACKETS M_4
+
+#define LOOKUPS_PER_PACKET 4
+#define NUM_COMPUTE_STEPS 512
+
 #define BATCH_SIZE 16
