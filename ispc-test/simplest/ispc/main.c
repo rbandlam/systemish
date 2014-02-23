@@ -2,8 +2,8 @@
 #include<stdlib.h>
 #include<time.h>
 #include<string.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
+#include<sys/ipc.h>
+#include<sys/shm.h>
 #include "common.h"
 
 int i;
@@ -24,7 +24,7 @@ void init_array()
 
 	srand(41);
 	for(i = 0; i < CAP; i++) {
-		data_arr[i] = rand() & CAP_;
+		data_arr[i] = i;
 	}
 
 	printf("Done initializing\n");
@@ -47,15 +47,11 @@ void end_timer()
 
 int main(int argc, char **argv)
 {
-	int i, j;
+	int i;
 	init_array();
 	start_timer();
-	
-	for(i = 0; i < CAP; i ++) {
-		for(j = 0; j < 8; j++) {
-			data_arr[i] *= 1.001;
-		}
-	}
+
+	simple(data_arr);
 
 	end_timer();
 	
