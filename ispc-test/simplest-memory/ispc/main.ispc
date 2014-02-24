@@ -1,6 +1,6 @@
 #include "common.h"
 
-export void simple(uniform int data_arr[], uniform int base_index) {
+export void simple(uniform int data_arr[]) {
     foreach (iter = 0 ... CAP) {
 		for(int j = 0; j < 64; j ++) {
 			data_arr[iter] *= 533;

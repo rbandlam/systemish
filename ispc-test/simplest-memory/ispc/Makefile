@@ -1,7 +1,7 @@
 CXX = clang -m64
-CXXFLAGS = -Iobjs/ -O3 -Wall -lrt
+CXXFLAGS = -Iobjs/ -O3 -Wall -lrt -g
 ISPC = ispc
-ISPCFLAGS = -O3 --arch=x86-64 --target=avx
+ISPCFLAGS = -O3 --arch=x86-64 --target=avx -g
 
 default: main
 
