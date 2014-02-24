@@ -38,12 +38,7 @@
 #define M_2048 2147483648
 #define M_2048_ 2147483647
 
-#define CAP M_128			//Capacity, in Integers
-#define CAP_ M_128_
+#define CAP M_32			//Capacity, in Integers
+#define CAP_ M_32_
 
-#define NUM_PACKETS M_4
-
-#define LOOKUPS_PER_PACKET 4
-#define NUM_COMPUTE_STEPS 512
-
-#define BATCH_SIZE 8
+#define PREFETCH 1

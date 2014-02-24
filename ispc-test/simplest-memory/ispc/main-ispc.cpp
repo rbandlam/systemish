@@ -118,11 +118,40 @@ typedef union {
   float Float;
   double Double;
 } llvmBitCastUnion;
+/* Structure and array forward declarations */
+struct l_array_0;
+
+/* Structure and array contents */
+struct l_array_0 {
+  static l_array_0 init(uint8_t *v0, uint8_t *v1, uint8_t *v2, uint8_t *v3, uint8_t *v4, uint8_t *v5, uint8_t *v6, uint8_t *v7, uint8_t *v8, uint8_t *v9, uint8_t *v10, uint8_t *v11, uint8_t *v12, uint8_t *v13, uint8_t *v14, uint8_t *v15) {
+    l_array_0 ret;
+    ret.array[0] = v0;
+    ret.array[1] = v1;
+    ret.array[2] = v2;
+    ret.array[3] = v3;
+    ret.array[4] = v4;
+    ret.array[5] = v5;
+    ret.array[6] = v6;
+    ret.array[7] = v7;
+    ret.array[8] = v8;
+    ret.array[9] = v9;
+    ret.array[10] = v10;
+    ret.array[11] = v11;
+    ret.array[12] = v12;
+    ret.array[13] = v13;
+    ret.array[14] = v14;
+    ret.array[15] = v15;
+    return ret;
+  }
+  uint8_t *array[16];
+} ;
+
+
 
 /* Function Declarations */
 extern "C" {
-void simple___un_3C_unf_3E_uni(float *data_arr_, uint32_t base_index_, __vec16_i1 __mask_);
-void simple(float *data_arr_, uint32_t base_index_);
+void simple___un_3C_uni_3E_(uint32_t *data_arr_, __vec16_i1 __mask_);
+void simple(uint32_t *data_arr_);
 }
 
 
@@ -145,49 +174,167 @@ template <typename A, typename B> static inline int llvm_fcmp_oge(A X, B Y) { re
 template <typename A> A *Memset(A *ptr, int count, size_t len) { return (A *)memset(ptr, count, len); }
 
 
-void simple___un_3C_unf_3E_uni(float *data_arr_, uint32_t base_index_, __vec16_i1 __mask_) {
-  bool internal_mask_26_function_mask27_any120_;
-  uint8_t *ptr_;
-  __vec16_f (*ptrcast_);
-  __vec16_i1 oldMask_26_test122_2e_us_;
-  __vec16_i1 oldMask_26_test122_2e_us___PHI;
-  __vec16_i32 j_2e_0121_2e_us_;
-  __vec16_i32 j_2e_0121_2e_us___PHI;
-  __vec16_f ptr_masked_load_2e_us_;
-  __vec16_i32 j_load41_plus1_2e_us_;
+void simple___un_3C_uni_3E_(uint32_t *data_arr_, __vec16_i1 __mask_) {
+  __vec16_i64 ptrArray_2e_i_;    /* Address-exposed local */
+  __vec16_i64 data_arr_load_ptr2int_smear_;
+  uint8_t *data_arr_load_ptr2int_2void_;
+  uint8_t *tmp__1_;
+  l_array_0 (*tmpcast_2e_i_);
+  bool internal_mask_26_function_mask34_any236_;
+  uint64_t indvars_2e_iv243_;
+  uint64_t indvars_2e_iv243___PHI;
+  uint32_t *ptr_2e_us253_;
+  uint8_t *ptr_2e_us_;
+  __vec16_i32 (*ptr_cast_for_load_2e_us_);
+  __vec16_i32 ptr_masked_load185_2e_us_;
+  uint64_t mask_bits_2e_0_2e_i_2e_us_;
+  uint64_t mask_bits_2e_0_2e_i_2e_us___PHI;
+  uint64_t first_set_2e_i_2e_us_;
+  uint64_t new_remaining_2e_i_2e_us_;
+  uint8_t *ptrArray_offset_load_2e_i_2e_us_;
+  __vec16_i32 data_arr_load66_offset_load213_2e_us_;
+  __vec16_i32 ptr221_masked_load224_2e_us_;
+  uint64_t indvars_2e_iv_2e_next244_;
+  __vec16_i1 oldMask_26_test238_2e_us_;
+  __vec16_i1 oldMask_26_test238_2e_us___PHI;
+  __vec16_i32 j_2e_0237_2e_us_;
+  __vec16_i32 j_2e_0237_2e_us___PHI;
+  __vec16_i32 ptr190_masked_load_2e_us_;
+  __vec16_i32 ptr203_masked_load_2e_us_;
+  __vec16_i32 j_load60_plus1_2e_us_;
   __vec16_i1 oldMask_26_test_2e_us_and_mask_;
-  bool internal_mask_26_function_mask27_any_2e_us_;
+  bool internal_mask_26_function_mask34_any_2e_us_;
+  uint64_t indvars_2e_iv_;
+  uint64_t indvars_2e_iv___PHI;
+  __vec16_i32 (*ptr_cast_for_load_);
+  __vec16_i32 ptr_masked_load185_;
+  uint64_t mask_bits_2e_0_2e_i_;
+  uint64_t mask_bits_2e_0_2e_i___PHI;
+  uint64_t first_set_2e_i_;
+  uint64_t new_remaining_2e_i_;
+  uint8_t *ptrArray_offset_load_2e_i_;
+  __vec16_i32 data_arr_load66_offset_load213_;
+  __vec16_i32 ptr221_masked_load224_;
+  uint64_t indvars_2e_iv_2e_next_;
 
-  internal_mask_26_function_mask27_any120_ = (( /*tail*/ __any(__smear_i1<__vec16_i1>(1)))&1);
-  ptr_ = (&(((uint8_t *)data_arr_))[((int64_t )(((int64_t )(int32_t )(base_index_ << 2u))))]);
-  ptrcast_ = ((__vec16_f (*))ptr_);
-  if (internal_mask_26_function_mask27_any120_) {
-    oldMask_26_test122_2e_us___PHI = __smear_i1<__vec16_i1>(1);   /* for PHI node */
-    j_2e_0121_2e_us___PHI = __setzero_i32<__vec16_i32>();   /* for PHI node */
-    goto for_loop_2e_us_label;
+  data_arr_load_ptr2int_smear_ = __smear_i64<__vec16_i64>((((uint64_t )(unsigned long)data_arr_)));
+  data_arr_load_ptr2int_2void_ = ((uint8_t *)data_arr_);
+  tmp__1_ = ((uint8_t *)(&ptrArray_2e_i_));
+  tmpcast_2e_i_ = ((l_array_0 (*))(&ptrArray_2e_i_));
+  internal_mask_26_function_mask34_any236_ = ((__any(__smear_i1<__vec16_i1>(1)))&1);
+  if (internal_mask_26_function_mask34_any236_) {
+    indvars_2e_iv243___PHI = 0ull;   /* for PHI node */
+    goto foreach_full_body_2e_us_label;
   } else {
-    goto foreach_reset_label;
+    indvars_2e_iv___PHI = 0ull;   /* for PHI node */
+    goto foreach_full_body_label;
   }
 
+  do {     /* Syntactic loop 'foreach_full_body.us' to make GCC happy */
+foreach_full_body_2e_us_label: {
+  indvars_2e_iv243_ = indvars_2e_iv243___PHI;
+  ptr_2e_us253_ = (&data_arr_[((int64_t )indvars_2e_iv243_)]);
+  ptr_2e_us_ = ((uint8_t *)ptr_2e_us253_);
+  ptr_cast_for_load_2e_us_ = ((__vec16_i32 (*))ptr_2e_us253_);
+  ptr_masked_load185_2e_us_ = __load<4>(ptr_cast_for_load_2e_us_);
+  __store<128>((&ptrArray_2e_i_), (__add(data_arr_load_ptr2int_smear_, ((__cast_sext(__vec16_i64 (), (__mul(ptr_masked_load185_2e_us_, __smear_i32<__vec16_i32>(4u)))))))));
+  mask_bits_2e_0_2e_i_2e_us___PHI = 65535ull;   /* for PHI node */
+  goto foreach_active_find_next_2e_i_2e_us_label;
+
+}
+  do {     /* Syntactic loop 'foreach_active_find_next.i.us' to make GCC happy */
+foreach_active_find_next_2e_i_2e_us_label: {
+  mask_bits_2e_0_2e_i_2e_us_ = mask_bits_2e_0_2e_i_2e_us___PHI;
+  first_set_2e_i_2e_us_ = __count_trailing_zeros_i64(mask_bits_2e_0_2e_i_2e_us_);
+  new_remaining_2e_i_2e_us_ = mask_bits_2e_0_2e_i_2e_us_ & ((1ull << first_set_2e_i_2e_us_) ^ 18446744073709551615ull);
+  ptrArray_offset_load_2e_i_2e_us_ = *((&(*tmpcast_2e_i_).array[((int64_t )(((int64_t )(((int64_t )(first_set_2e_i_2e_us_ << 32ull)) >> ((int64_t )32ull)))))]));
+  __prefetch_read_uniform_1(ptrArray_offset_load_2e_i_2e_us_);
+  if ((new_remaining_2e_i_2e_us_ == 0ull)) {
+    oldMask_26_test238_2e_us___PHI = __smear_i1<__vec16_i1>(1);   /* for PHI node */
+    j_2e_0237_2e_us___PHI = __setzero_i32<__vec16_i32>();   /* for PHI node */
+    goto for_loop_2e_us_label;
+  } else {
+    mask_bits_2e_0_2e_i_2e_us___PHI = new_remaining_2e_i_2e_us_;   /* for PHI node */
+    goto foreach_active_find_next_2e_i_2e_us_label;
+  }
+
+}
+  } while (1); /* end of syntactic loop 'foreach_active_find_next.i.us' */
   do {     /* Syntactic loop 'for_loop.us' to make GCC happy */
 for_loop_2e_us_label: {
-  oldMask_26_test122_2e_us_ = oldMask_26_test122_2e_us___PHI;
-  j_2e_0121_2e_us_ = j_2e_0121_2e_us___PHI;
-  ptr_masked_load_2e_us_ =  /*tail*/ __masked_load_float(ptr_, oldMask_26_test122_2e_us_);
-  __masked_store_float(ptrcast_, (__mul(ptr_masked_load_2e_us_, __smear_float<__vec16_f>(0x1.00418ap+0))), oldMask_26_test122_2e_us_);
-  j_load41_plus1_2e_us_ = __add(j_2e_0121_2e_us_, __smear_i32<__vec16_i32>(1u));
-  oldMask_26_test_2e_us_and_mask_ = __signed_less_than_i32_and_mask(j_load41_plus1_2e_us_, __smear_i32<__vec16_i32>(8u), oldMask_26_test122_2e_us_);
-  internal_mask_26_function_mask27_any_2e_us_ = (( /*tail*/ __any(oldMask_26_test_2e_us_and_mask_))&1);
-  if (internal_mask_26_function_mask27_any_2e_us_) {
-    oldMask_26_test122_2e_us___PHI = oldMask_26_test_2e_us_and_mask_;   /* for PHI node */
-    j_2e_0121_2e_us___PHI = j_load41_plus1_2e_us_;   /* for PHI node */
+  oldMask_26_test238_2e_us_ = oldMask_26_test238_2e_us___PHI;
+  j_2e_0237_2e_us_ = j_2e_0237_2e_us___PHI;
+  ptr190_masked_load_2e_us_ = __masked_load_i32(ptr_2e_us_, oldMask_26_test238_2e_us_);
+  __masked_store_i32(ptr_cast_for_load_2e_us_, (__mul(ptr190_masked_load_2e_us_, __smear_i32<__vec16_i32>(533u))), oldMask_26_test238_2e_us_);
+  ptr203_masked_load_2e_us_ = __masked_load_i32(ptr_2e_us_, oldMask_26_test238_2e_us_);
+  __masked_store_i32(ptr_cast_for_load_2e_us_, (__and(ptr203_masked_load_2e_us_, __smear_i32<__vec16_i32>(33554431u))), oldMask_26_test238_2e_us_);
+  j_load60_plus1_2e_us_ = __add(j_2e_0237_2e_us_, __smear_i32<__vec16_i32>(1u));
+  oldMask_26_test_2e_us_and_mask_ = __signed_less_than_i32_and_mask(j_load60_plus1_2e_us_, __smear_i32<__vec16_i32>(64u), oldMask_26_test238_2e_us_);
+  internal_mask_26_function_mask34_any_2e_us_ = ((__any(oldMask_26_test_2e_us_and_mask_))&1);
+  if (internal_mask_26_function_mask34_any_2e_us_) {
+    oldMask_26_test238_2e_us___PHI = oldMask_26_test_2e_us_and_mask_;   /* for PHI node */
+    j_2e_0237_2e_us___PHI = j_load60_plus1_2e_us_;   /* for PHI node */
     goto for_loop_2e_us_label;
+  } else {
+    goto for_exit_2e_us_label;
+  }
+
+}
+  } while (1); /* end of syntactic loop 'for_loop.us' */
+for_exit_2e_us_label: {
+  data_arr_load66_offset_load213_2e_us_ = __gather_base_offsets32_i32(data_arr_load_ptr2int_2void_, 4u, ptr_masked_load185_2e_us_, __smear_i1<__vec16_i1>(1));
+  ptr221_masked_load224_2e_us_ = __load<4>(ptr_cast_for_load_2e_us_);
+  __store<4>(ptr_cast_for_load_2e_us_, (__add(ptr221_masked_load224_2e_us_, data_arr_load66_offset_load213_2e_us_)));
+  indvars_2e_iv_2e_next244_ = ((uint64_t )(((uint64_t )indvars_2e_iv243_) + ((uint64_t )16ull)));
+  if ((((int32_t )(((uint32_t )indvars_2e_iv_2e_next244_))) < ((int32_t )33554432u))) {
+    indvars_2e_iv243___PHI = indvars_2e_iv_2e_next244_;   /* for PHI node */
+    goto foreach_full_body_2e_us_label;
   } else {
     goto foreach_reset_label;
   }
 
 }
-  } while (1); /* end of syntactic loop 'for_loop.us' */
+  } while (1); /* end of syntactic loop 'foreach_full_body.us' */
+  do {     /* Syntactic loop 'foreach_full_body' to make GCC happy */
+foreach_full_body_label: {
+  indvars_2e_iv_ = indvars_2e_iv___PHI;
+  ptr_cast_for_load_ = ((__vec16_i32 (*))((&data_arr_[((int64_t )indvars_2e_iv_)])));
+  ptr_masked_load185_ = __load<4>(ptr_cast_for_load_);
+  __store<128>((&ptrArray_2e_i_), (__add(data_arr_load_ptr2int_smear_, ((__cast_sext(__vec16_i64 (), (__mul(ptr_masked_load185_, __smear_i32<__vec16_i32>(4u)))))))));
+  mask_bits_2e_0_2e_i___PHI = 65535ull;   /* for PHI node */
+  goto foreach_active_find_next_2e_i_label;
+
+}
+  do {     /* Syntactic loop 'foreach_active_find_next.i' to make GCC happy */
+foreach_active_find_next_2e_i_label: {
+  mask_bits_2e_0_2e_i_ = mask_bits_2e_0_2e_i___PHI;
+  first_set_2e_i_ = __count_trailing_zeros_i64(mask_bits_2e_0_2e_i_);
+  new_remaining_2e_i_ = mask_bits_2e_0_2e_i_ & ((1ull << first_set_2e_i_) ^ 18446744073709551615ull);
+  ptrArray_offset_load_2e_i_ = *((&(*tmpcast_2e_i_).array[((int64_t )(((int64_t )(((int64_t )(first_set_2e_i_ << 32ull)) >> ((int64_t )32ull)))))]));
+  __prefetch_read_uniform_1(ptrArray_offset_load_2e_i_);
+  if ((new_remaining_2e_i_ == 0ull)) {
+    goto for_exit_label;
+  } else {
+    mask_bits_2e_0_2e_i___PHI = new_remaining_2e_i_;   /* for PHI node */
+    goto foreach_active_find_next_2e_i_label;
+  }
+
+}
+  } while (1); /* end of syntactic loop 'foreach_active_find_next.i' */
+for_exit_label: {
+  data_arr_load66_offset_load213_ = __gather_base_offsets32_i32(data_arr_load_ptr2int_2void_, 4u, ptr_masked_load185_, __smear_i1<__vec16_i1>(1));
+  ptr221_masked_load224_ = __load<4>(ptr_cast_for_load_);
+  __store<4>(ptr_cast_for_load_, (__add(ptr221_masked_load224_, data_arr_load66_offset_load213_)));
+  indvars_2e_iv_2e_next_ = ((uint64_t )(((uint64_t )indvars_2e_iv_) + ((uint64_t )16ull)));
+  if ((((int32_t )(((uint32_t )indvars_2e_iv_2e_next_))) < ((int32_t )33554432u))) {
+    indvars_2e_iv___PHI = indvars_2e_iv_2e_next_;   /* for PHI node */
+    goto foreach_full_body_label;
+  } else {
+    goto foreach_reset_label;
+  }
+
+}
+  } while (1); /* end of syntactic loop 'foreach_full_body' */
 foreach_reset_label: {
   return;
 }
@@ -195,49 +342,167 @@ foreach_reset_label: {
 
 
 
-void simple(float *data_arr_, uint32_t base_index_) {
-  bool internal_mask_26_function_mask27_any120_;
-  uint8_t *ptr_;
-  __vec16_f (*ptrcast_);
-  __vec16_i1 oldMask_26_test122_2e_us_;
-  __vec16_i1 oldMask_26_test122_2e_us___PHI;
-  __vec16_i32 j_2e_0121_2e_us_;
-  __vec16_i32 j_2e_0121_2e_us___PHI;
-  __vec16_f ptr_masked_load_2e_us_;
-  __vec16_i32 j_load41_plus1_2e_us_;
+void simple(uint32_t *data_arr_) {
+  __vec16_i64 ptrArray_2e_i_;    /* Address-exposed local */
+  __vec16_i64 data_arr_load_ptr2int_smear_;
+  uint8_t *data_arr_load_ptr2int_2void_;
+  uint8_t *tmp__2_;
+  l_array_0 (*tmpcast_2e_i_);
+  bool internal_mask_26_function_mask34_any236_;
+  uint64_t indvars_2e_iv243_;
+  uint64_t indvars_2e_iv243___PHI;
+  uint32_t *ptr_2e_us253_;
+  uint8_t *ptr_2e_us_;
+  __vec16_i32 (*ptr_cast_for_load_2e_us_);
+  __vec16_i32 ptr_masked_load185_2e_us_;
+  uint64_t mask_bits_2e_0_2e_i_2e_us_;
+  uint64_t mask_bits_2e_0_2e_i_2e_us___PHI;
+  uint64_t first_set_2e_i_2e_us_;
+  uint64_t new_remaining_2e_i_2e_us_;
+  uint8_t *ptrArray_offset_load_2e_i_2e_us_;
+  __vec16_i32 data_arr_load66_offset_load213_2e_us_;
+  __vec16_i32 ptr221_masked_load224_2e_us_;
+  uint64_t indvars_2e_iv_2e_next244_;
+  __vec16_i1 oldMask_26_test238_2e_us_;
+  __vec16_i1 oldMask_26_test238_2e_us___PHI;
+  __vec16_i32 j_2e_0237_2e_us_;
+  __vec16_i32 j_2e_0237_2e_us___PHI;
+  __vec16_i32 ptr190_masked_load_2e_us_;
+  __vec16_i32 ptr203_masked_load_2e_us_;
+  __vec16_i32 j_load60_plus1_2e_us_;
   __vec16_i1 oldMask_26_test_2e_us_and_mask_;
-  bool internal_mask_26_function_mask27_any_2e_us_;
+  bool internal_mask_26_function_mask34_any_2e_us_;
+  uint64_t indvars_2e_iv_;
+  uint64_t indvars_2e_iv___PHI;
+  __vec16_i32 (*ptr_cast_for_load_);
+  __vec16_i32 ptr_masked_load185_;
+  uint64_t mask_bits_2e_0_2e_i_;
+  uint64_t mask_bits_2e_0_2e_i___PHI;
+  uint64_t first_set_2e_i_;
+  uint64_t new_remaining_2e_i_;
+  uint8_t *ptrArray_offset_load_2e_i_;
+  __vec16_i32 data_arr_load66_offset_load213_;
+  __vec16_i32 ptr221_masked_load224_;
+  uint64_t indvars_2e_iv_2e_next_;
 
-  internal_mask_26_function_mask27_any120_ = (( /*tail*/ __any(__smear_i1<__vec16_i1>(1)))&1);
-  ptr_ = (&(((uint8_t *)data_arr_))[((int64_t )(((int64_t )(int32_t )(base_index_ << 2u))))]);
-  ptrcast_ = ((__vec16_f (*))ptr_);
-  if (internal_mask_26_function_mask27_any120_) {
-    oldMask_26_test122_2e_us___PHI = __smear_i1<__vec16_i1>(1);   /* for PHI node */
-    j_2e_0121_2e_us___PHI = __setzero_i32<__vec16_i32>();   /* for PHI node */
-    goto for_loop_2e_us_label;
+  data_arr_load_ptr2int_smear_ = __smear_i64<__vec16_i64>((((uint64_t )(unsigned long)data_arr_)));
+  data_arr_load_ptr2int_2void_ = ((uint8_t *)data_arr_);
+  tmp__2_ = ((uint8_t *)(&ptrArray_2e_i_));
+  tmpcast_2e_i_ = ((l_array_0 (*))(&ptrArray_2e_i_));
+  internal_mask_26_function_mask34_any236_ = ((__any(__smear_i1<__vec16_i1>(1)))&1);
+  if (internal_mask_26_function_mask34_any236_) {
+    indvars_2e_iv243___PHI = 0ull;   /* for PHI node */
+    goto foreach_full_body_2e_us_label;
   } else {
-    goto foreach_reset_label;
+    indvars_2e_iv___PHI = 0ull;   /* for PHI node */
+    goto foreach_full_body_label;
   }
 
+  do {     /* Syntactic loop 'foreach_full_body.us' to make GCC happy */
+foreach_full_body_2e_us_label: {
+  indvars_2e_iv243_ = indvars_2e_iv243___PHI;
+  ptr_2e_us253_ = (&data_arr_[((int64_t )indvars_2e_iv243_)]);
+  ptr_2e_us_ = ((uint8_t *)ptr_2e_us253_);
+  ptr_cast_for_load_2e_us_ = ((__vec16_i32 (*))ptr_2e_us253_);
+  ptr_masked_load185_2e_us_ = __load<4>(ptr_cast_for_load_2e_us_);
+  __store<128>((&ptrArray_2e_i_), (__add(data_arr_load_ptr2int_smear_, ((__cast_sext(__vec16_i64 (), (__mul(ptr_masked_load185_2e_us_, __smear_i32<__vec16_i32>(4u)))))))));
+  mask_bits_2e_0_2e_i_2e_us___PHI = 65535ull;   /* for PHI node */
+  goto foreach_active_find_next_2e_i_2e_us_label;
+
+}
+  do {     /* Syntactic loop 'foreach_active_find_next.i.us' to make GCC happy */
+foreach_active_find_next_2e_i_2e_us_label: {
+  mask_bits_2e_0_2e_i_2e_us_ = mask_bits_2e_0_2e_i_2e_us___PHI;
+  first_set_2e_i_2e_us_ = __count_trailing_zeros_i64(mask_bits_2e_0_2e_i_2e_us_);
+  new_remaining_2e_i_2e_us_ = mask_bits_2e_0_2e_i_2e_us_ & ((1ull << first_set_2e_i_2e_us_) ^ 18446744073709551615ull);
+  ptrArray_offset_load_2e_i_2e_us_ = *((&(*tmpcast_2e_i_).array[((int64_t )(((int64_t )(((int64_t )(first_set_2e_i_2e_us_ << 32ull)) >> ((int64_t )32ull)))))]));
+  __prefetch_read_uniform_1(ptrArray_offset_load_2e_i_2e_us_);
+  if ((new_remaining_2e_i_2e_us_ == 0ull)) {
+    oldMask_26_test238_2e_us___PHI = __smear_i1<__vec16_i1>(1);   /* for PHI node */
+    j_2e_0237_2e_us___PHI = __setzero_i32<__vec16_i32>();   /* for PHI node */
+    goto for_loop_2e_us_label;
+  } else {
+    mask_bits_2e_0_2e_i_2e_us___PHI = new_remaining_2e_i_2e_us_;   /* for PHI node */
+    goto foreach_active_find_next_2e_i_2e_us_label;
+  }
+
+}
+  } while (1); /* end of syntactic loop 'foreach_active_find_next.i.us' */
   do {     /* Syntactic loop 'for_loop.us' to make GCC happy */
 for_loop_2e_us_label: {
-  oldMask_26_test122_2e_us_ = oldMask_26_test122_2e_us___PHI;
-  j_2e_0121_2e_us_ = j_2e_0121_2e_us___PHI;
-  ptr_masked_load_2e_us_ =  /*tail*/ __masked_load_float(ptr_, oldMask_26_test122_2e_us_);
-  __masked_store_float(ptrcast_, (__mul(ptr_masked_load_2e_us_, __smear_float<__vec16_f>(0x1.00418ap+0))), oldMask_26_test122_2e_us_);
-  j_load41_plus1_2e_us_ = __add(j_2e_0121_2e_us_, __smear_i32<__vec16_i32>(1u));
-  oldMask_26_test_2e_us_and_mask_ = __signed_less_than_i32_and_mask(j_load41_plus1_2e_us_, __smear_i32<__vec16_i32>(8u), oldMask_26_test122_2e_us_);
-  internal_mask_26_function_mask27_any_2e_us_ = (( /*tail*/ __any(oldMask_26_test_2e_us_and_mask_))&1);
-  if (internal_mask_26_function_mask27_any_2e_us_) {
-    oldMask_26_test122_2e_us___PHI = oldMask_26_test_2e_us_and_mask_;   /* for PHI node */
-    j_2e_0121_2e_us___PHI = j_load41_plus1_2e_us_;   /* for PHI node */
+  oldMask_26_test238_2e_us_ = oldMask_26_test238_2e_us___PHI;
+  j_2e_0237_2e_us_ = j_2e_0237_2e_us___PHI;
+  ptr190_masked_load_2e_us_ = __masked_load_i32(ptr_2e_us_, oldMask_26_test238_2e_us_);
+  __masked_store_i32(ptr_cast_for_load_2e_us_, (__mul(ptr190_masked_load_2e_us_, __smear_i32<__vec16_i32>(533u))), oldMask_26_test238_2e_us_);
+  ptr203_masked_load_2e_us_ = __masked_load_i32(ptr_2e_us_, oldMask_26_test238_2e_us_);
+  __masked_store_i32(ptr_cast_for_load_2e_us_, (__and(ptr203_masked_load_2e_us_, __smear_i32<__vec16_i32>(33554431u))), oldMask_26_test238_2e_us_);
+  j_load60_plus1_2e_us_ = __add(j_2e_0237_2e_us_, __smear_i32<__vec16_i32>(1u));
+  oldMask_26_test_2e_us_and_mask_ = __signed_less_than_i32_and_mask(j_load60_plus1_2e_us_, __smear_i32<__vec16_i32>(64u), oldMask_26_test238_2e_us_);
+  internal_mask_26_function_mask34_any_2e_us_ = ((__any(oldMask_26_test_2e_us_and_mask_))&1);
+  if (internal_mask_26_function_mask34_any_2e_us_) {
+    oldMask_26_test238_2e_us___PHI = oldMask_26_test_2e_us_and_mask_;   /* for PHI node */
+    j_2e_0237_2e_us___PHI = j_load60_plus1_2e_us_;   /* for PHI node */
     goto for_loop_2e_us_label;
+  } else {
+    goto for_exit_2e_us_label;
+  }
+
+}
+  } while (1); /* end of syntactic loop 'for_loop.us' */
+for_exit_2e_us_label: {
+  data_arr_load66_offset_load213_2e_us_ = __gather_base_offsets32_i32(data_arr_load_ptr2int_2void_, 4u, ptr_masked_load185_2e_us_, __smear_i1<__vec16_i1>(1));
+  ptr221_masked_load224_2e_us_ = __load<4>(ptr_cast_for_load_2e_us_);
+  __store<4>(ptr_cast_for_load_2e_us_, (__add(ptr221_masked_load224_2e_us_, data_arr_load66_offset_load213_2e_us_)));
+  indvars_2e_iv_2e_next244_ = ((uint64_t )(((uint64_t )indvars_2e_iv243_) + ((uint64_t )16ull)));
+  if ((((int32_t )(((uint32_t )indvars_2e_iv_2e_next244_))) < ((int32_t )33554432u))) {
+    indvars_2e_iv243___PHI = indvars_2e_iv_2e_next244_;   /* for PHI node */
+    goto foreach_full_body_2e_us_label;
   } else {
     goto foreach_reset_label;
   }
 
 }
-  } while (1); /* end of syntactic loop 'for_loop.us' */
+  } while (1); /* end of syntactic loop 'foreach_full_body.us' */
+  do {     /* Syntactic loop 'foreach_full_body' to make GCC happy */
+foreach_full_body_label: {
+  indvars_2e_iv_ = indvars_2e_iv___PHI;
+  ptr_cast_for_load_ = ((__vec16_i32 (*))((&data_arr_[((int64_t )indvars_2e_iv_)])));
+  ptr_masked_load185_ = __load<4>(ptr_cast_for_load_);
+  __store<128>((&ptrArray_2e_i_), (__add(data_arr_load_ptr2int_smear_, ((__cast_sext(__vec16_i64 (), (__mul(ptr_masked_load185_, __smear_i32<__vec16_i32>(4u)))))))));
+  mask_bits_2e_0_2e_i___PHI = 65535ull;   /* for PHI node */
+  goto foreach_active_find_next_2e_i_label;
+
+}
+  do {     /* Syntactic loop 'foreach_active_find_next.i' to make GCC happy */
+foreach_active_find_next_2e_i_label: {
+  mask_bits_2e_0_2e_i_ = mask_bits_2e_0_2e_i___PHI;
+  first_set_2e_i_ = __count_trailing_zeros_i64(mask_bits_2e_0_2e_i_);
+  new_remaining_2e_i_ = mask_bits_2e_0_2e_i_ & ((1ull << first_set_2e_i_) ^ 18446744073709551615ull);
+  ptrArray_offset_load_2e_i_ = *((&(*tmpcast_2e_i_).array[((int64_t )(((int64_t )(((int64_t )(first_set_2e_i_ << 32ull)) >> ((int64_t )32ull)))))]));
+  __prefetch_read_uniform_1(ptrArray_offset_load_2e_i_);
+  if ((new_remaining_2e_i_ == 0ull)) {
+    goto for_exit_label;
+  } else {
+    mask_bits_2e_0_2e_i___PHI = new_remaining_2e_i_;   /* for PHI node */
+    goto foreach_active_find_next_2e_i_label;
+  }
+
+}
+  } while (1); /* end of syntactic loop 'foreach_active_find_next.i' */
+for_exit_label: {
+  data_arr_load66_offset_load213_ = __gather_base_offsets32_i32(data_arr_load_ptr2int_2void_, 4u, ptr_masked_load185_, __smear_i1<__vec16_i1>(1));
+  ptr221_masked_load224_ = __load<4>(ptr_cast_for_load_);
+  __store<4>(ptr_cast_for_load_, (__add(ptr221_masked_load224_, data_arr_load66_offset_load213_)));
+  indvars_2e_iv_2e_next_ = ((uint64_t )(((uint64_t )indvars_2e_iv_) + ((uint64_t )16ull)));
+  if ((((int32_t )(((uint32_t )indvars_2e_iv_2e_next_))) < ((int32_t )33554432u))) {
+    indvars_2e_iv___PHI = indvars_2e_iv_2e_next_;   /* for PHI node */
+    goto foreach_full_body_label;
+  } else {
+    goto foreach_reset_label;
+  }
+
+}
+  } while (1); /* end of syntactic loop 'foreach_full_body' */
 foreach_reset_label: {
   return;
 }

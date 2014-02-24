@@ -24,7 +24,7 @@ void init_array()
 
 	srand(41);
 	for(i = 0; i < CAP; i++) {
-		data_arr[i] = i;
+		data_arr[i] = rand() & CAP_;
 	}
 
 	printf("Done initializing\n");
@@ -47,7 +47,6 @@ void end_timer()
 
 int main(int argc, char **argv)
 {
-	int i;
 	init_array();
 	start_timer();
 
