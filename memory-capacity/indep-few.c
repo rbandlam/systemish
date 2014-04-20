@@ -1,4 +1,4 @@
-// Measure the performance of independent memory accesses
+// Measure the performance of few independent memory accesses
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
