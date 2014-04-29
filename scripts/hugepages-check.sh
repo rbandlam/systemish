@@ -1,1 +1,1 @@
-cat /proc/meminfo | grep Huge
+cat /sys/devices/system/node/*/meminfo | grep Huge
