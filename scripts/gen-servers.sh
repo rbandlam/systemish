@@ -1,7 +1,7 @@
-NUM_SERVERS=512
+NUM_SERVERS=32
 hi=`expr $NUM_SERVERS - 1`
 echo $hi
 for i in `seq 0 $hi`; do
-	echo "10.0.0.50"
+	echo "node-1.RDMA.fawn.apt.emulab.net"
 	echo `expr 5500 + $i`
 done
