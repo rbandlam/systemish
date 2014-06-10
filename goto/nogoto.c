@@ -27,7 +27,7 @@ int hash(int a)
 {
 	int ret = a;
 	int i;
-	for(i = 0; i < 50; i++) {
+	for(i = 0; i < 20; i++) {
 		ret = ret + rand();
 	}
 
@@ -39,7 +39,7 @@ int process_pkts_in_batch(int *pkt_lo)
 {
 	for(batch_index = 0; batch_index < BATCH_SIZE; batch_index ++) {
 
-		// Compute
+		// Compute	
 		mem_addr[batch_index] = hash(pkt_lo[batch_index]) & LOG_CAP_;
 
 		// Memory access

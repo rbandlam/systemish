@@ -27,7 +27,7 @@ int hash(int a)
 {
 	int ret = a;
 	int i;
-	for(i = 0; i < 50; i++) {
+	for(i = 0; i < 20; i++) {
 		ret = ret + rand();
 	}
 
@@ -35,15 +35,28 @@ int hash(int a)
 }
 
 // Process BATCH_SIZE pkts starting from lo
-int process_pkts_in_range(int lo)
+int process_pkts_in_batch(int *pkt_lo)
 {
-	batch_index = lo & BATCH_SIZE_;
-	
-	// Compute
-	mem_addr[batch_index] = hash(pkts[batch_index]) & LOG_CAP_;
+	batch_index = 0;
 
+label1:
+	// Compute	
+	mem_addr[batch_index] = hash(pkt_lo[batch_index]) & LOG_CAP_;
+	__builtin_prefetch(&ht_log[mem_addr[batch_index]], 0, 0);
+
+	batch_index = (batch_index + 1) & BATCH_SIZE_;
+	if(batch_index != 0) {
+		goto label1;
+	}
+
+label2:
 	// Memory access
 	sum += ht_log[mem_addr[batch_index]];
+
+	batch_index = (batch_index + 1) & BATCH_SIZE_;
+	if(batch_index != 0) {
+		goto label2;
+	}
 }
 
 int main(int argc, char **argv)
@@ -73,7 +86,7 @@ int main(int argc, char **argv)
 	clock_gettime(CLOCK_REALTIME, &start);
 
 	for(i = 0; i < NUM_PKTS; i += BATCH_SIZE) {
-		process_pkts_in_range(i);
+		process_pkts_in_batch(&pkts[i]);
 	}
 
 	clock_gettime(CLOCK_REALTIME, &end);
