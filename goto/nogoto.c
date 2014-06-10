@@ -5,6 +5,8 @@
 #include<sys/ipc.h>
 #include<sys/shm.h>
 
+#include "param.h"
+
 #define G_2_ ((2 * 1024 * 1024 * 1024) - 1)
 int sum = 0;
 int *ht_log;
@@ -27,7 +29,7 @@ int hash(int a)
 {
 	int ret = a;
 	int i;
-	for(i = 0; i < 20; i++) {
+	for(i = 0; i < COMPUTE; i++) {
 		ret = ret + rand();
 	}
 
@@ -68,7 +70,7 @@ int main(int argc, char **argv)
 		pkts[i] = rand() & LOG_CAP_;
 	}
 
-	printf("Finished creating ht_log and packets\n");
+	fprintf(stderr, "Finished creating ht_log and packets\n");
 
 	struct timespec start, end;
 	clock_gettime(CLOCK_REALTIME, &start);
@@ -78,7 +80,7 @@ int main(int argc, char **argv)
 	}
 
 	clock_gettime(CLOCK_REALTIME, &end);
-	printf("Time = %f, sum = %d\n", 
+	printf("Time = %f sum = %d\n", 
 		(end.tv_sec - start.tv_sec) + (double) (end.tv_nsec - start.tv_nsec) / 1000000000,
 		sum);
 }
