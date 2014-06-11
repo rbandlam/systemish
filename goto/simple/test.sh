@@ -1,4 +1,4 @@
-for compute in `seq 1 1 50`; do
+for compute in `seq 1 5 50`; do
 	echo "#define COMPUTE $compute" > param.h
 	make
 

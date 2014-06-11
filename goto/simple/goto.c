@@ -7,10 +7,13 @@
 
 #include "param.h"
 
+// Each packet contains a random integer. The memory address accessed
+// by the packet is determined by an expensive hash of the integer.
+
 #define G_2_ ((2 * 1024 * 1024 * 1024) - 1)
 int sum = 0;
-int *ht_log;
 
+int *ht_log;
 #define LOG_CAP (128 * 1024 * 1024)
 #define LOG_CAP_ ((128 * 1024 * 1024) - 1)
 #define LOG_SID 1
@@ -25,12 +28,13 @@ int batch_index = 0;
 int mem_addr[BATCH_SIZE];
 
 // Some compute function
+// Increment 'a' by at most COMPUTE * 4: the return value is still random
 int hash(int a)
 {
 	int ret = a;
 	int i;
 	for(i = 0; i < COMPUTE; i++) {
-		ret = ret + rand();
+		ret = ret + ((i * ret) % 5);
 	}
 
 	return ret;
