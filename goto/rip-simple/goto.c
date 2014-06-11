@@ -43,10 +43,12 @@ int hash(int a)
 int process_pkts_in_batch(int *pkt_lo)
 {
 	uint64_t my_rip;
-	asm volatile ("lea (%%rip), %0" : "=r"(my_rip));
+	asm ("lea (%%rip), %0" : "=r"(my_rip));
 
-	asm volatile ("mov %0, %%rax" :: "r" (my_rip) : "rax");
-	asm volatile ("jmp *%rax");
+	printf("Doh doh\n");
+	sleep(1);
+	asm ("mov %0, %%rax" :: "r" (my_rip) : "rax");
+	asm ("jmp *%rax");
 
 }
 

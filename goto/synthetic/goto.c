@@ -10,83 +10,96 @@
 // Each packet contains a random integer. The memory address accessed
 // by the packet is determined by an expensive hash of the integer.
 
-#define G_2_ ((2 * 1024 * 1024 * 1024) - 1)
-int sum = 0;
+#define SLOTS_PER_BKT 16
 
-int *ht_log;
-#define LOG_CAP (128 * 1024 * 1024)
-#define LOG_CAP_ ((128 * 1024 * 1024) - 1)
-#define LOG_SID 1
+struct cache_bkt		/* 64 bytes */
+{
+	int slot_arr[SLOTS_PER_BKT];
+};
+struct cache_bkt *cache;
+
+#define CACHE_SID 1
+#define NUM_BS (2 * 1024 * 1024)		// Number of cache buckets (avoiding BKTS)
+#define NUM_BS_ ((2 * 1024 * 1024) - 1)
 
 int *pkts;
-#define NUM_PKTS (16 * 1024 * 1024)
+#define NUM_PKTS (1024 * 1024)
 
 #define BATCH_SIZE 8
 #define BATCH_SIZE_ 7
 
+#define DEPTH 4
+
+int sum = 0;
 int batch_index = 0;
-int mem_addr[BATCH_SIZE];
-
-// Some compute function
-// Increment 'a' by at most COMPUTE * 4: the return value is still random
-int hash(int a)
-{
-	int ret = a;
-	int i;
-	for(i = 0; i < COMPUTE; i++) {
-		ret = ret + ((i * ret) % 5);
-	}
-
-	return ret;
-}
 
 // Process BATCH_SIZE pkts starting from lo
 int process_pkts_in_batch(int *pkt_lo)
 {
-	batch_index = 0;
+	// Like a foreach loop
+	
+	int __i[BATCH_SIZE], __jumper[BATCH_SIZE], __j[BATCH_SIZE], __best_j[BATCH_SIZE];
+	int __max_diff[BATCH_SIZE];
+	struct cache_bkt *__bkt[BATCH_SIZE];
 
-label1:
-	// Compute	
-	mem_addr[batch_index] = hash(pkt_lo[batch_index]) & LOG_CAP_;
-	__builtin_prefetch(&ht_log[mem_addr[batch_index]], 0, 0);
+	int batch_index = 0;
 
-	batch_index = (batch_index + 1) & BATCH_SIZE_;
-	if(batch_index != 0) {
-		goto label1;
-	}
+label1:		
+	__jumper[batch_index] = pkt_lo[batch_index];
+			
+	for(i = 0; i < DEPTH; i++) {
+		__builtin_prefetch(&cache[__jumper[batch_index]]);
+		batch_index = (batch_index + 1) & BATCH_SIZE_;
+		if(batch_index != 0) {
+			goto label1;
+		}
 
+		__bkt[batch_index] = &cache[__jumper[batch_index]];
 label2:
-	// Memory access
-	sum += ht_log[mem_addr[batch_index]];
+		int j, best_j = 0;
 
-	batch_index = (batch_index + 1) & BATCH_SIZE_;
-	if(batch_index != 0) {
-		goto label2;
+		int max_diff = bkt->slot_arr[0] - jumper;
+
+		for(j = 1; j < SLOTS_PER_BKT; j ++) {
+			if(bkt->slot_arr[j] - jumper > max_diff) {
+				max_diff = bkt->slot_arr[j] - jumper;
+				best_j = j;
+			}
+		}
+		
+		jumper = bkt->slot_arr[best_j];
 	}
+
+	sum += jumper;
 }
 
 int main(int argc, char **argv)
 {
-	int i;
+	int i, j;
 
 	// Allocate a large memory area
-	int sid = shmget(LOG_SID, LOG_CAP * sizeof(int), IPC_CREAT | 0666 | SHM_HUGETLB);
+	int sid = shmget(CACHE_SID, NUM_BS * sizeof(struct cache_bkt), 
+		IPC_CREAT | 0666 | SHM_HUGETLB);
 	if(sid < 0) {
-		fprintf(stderr, "Could not create ht_log\n");
+		fprintf(stderr, "Could not create cache\n");
 		exit(-1);
 	}
-	ht_log = shmat(sid, 0, 0);
-	for(i = 0; i < LOG_CAP; i ++) {
-		ht_log[i] = i;
+	cache = shmat(sid, 0, 0);
+
+	// Fill in the cache with index into itself
+	for(i = 0; i < NUM_BS; i ++) {
+		for(j = 0; j < SLOTS_PER_BKT; j++) {
+			cache[i].slot_arr[j] = rand() & NUM_BS_;
+		}
 	}
 
 	// Allocate the packets
 	pkts = (int *) malloc(NUM_PKTS * sizeof(int));
 	for(i = 0; i < NUM_PKTS; i++) {
-		pkts[i] = rand() & LOG_CAP_;
+		pkts[i] = rand() & NUM_BS_;
 	}
 
-	fprintf(stderr, "Finished creating ht_log and packets\n");
+	fprintf(stderr, "Finished creating cache and packets\n");
 
 	struct timespec start, end;
 	clock_gettime(CLOCK_REALTIME, &start);
