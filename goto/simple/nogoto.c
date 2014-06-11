@@ -16,13 +16,12 @@ int *ht_log;
 #define LOG_SID 1
 
 int *pkts;
-#define NUM_PKTS (64 * 1024 * 1024)
+#define NUM_PKTS (16 * 1024 * 1024)
 
 #define BATCH_SIZE 8
 #define BATCH_SIZE_ 7
 
 int batch_index = 0;
-int mem_addr[BATCH_SIZE];
 
 // Some compute function
 int hash(int a)
@@ -39,13 +38,11 @@ int hash(int a)
 // Process BATCH_SIZE pkts starting from lo
 int process_pkts_in_batch(int *pkt_lo)
 {
+	// Like a foreach loop
 	for(batch_index = 0; batch_index < BATCH_SIZE; batch_index ++) {
 
-		// Compute	
-		mem_addr[batch_index] = hash(pkt_lo[batch_index]) & LOG_CAP_;
-
-		// Memory access
-		sum += ht_log[mem_addr[batch_index]];
+		int mem_addr = hash(pkt_lo[batch_index]) & LOG_CAP_;
+		sum += ht_log[mem_addr];
 	}
 }
 

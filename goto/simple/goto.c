@@ -16,7 +16,7 @@ int *ht_log;
 #define LOG_SID 1
 
 int *pkts;
-#define NUM_PKTS (64 * 1024 * 1024)
+#define NUM_PKTS (16 * 1024 * 1024)
 
 #define BATCH_SIZE 8
 #define BATCH_SIZE_ 7
