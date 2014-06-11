@@ -25,6 +25,7 @@ int *pkts;
 #define BATCH_SIZE_ 7
 
 int batch_index = 0;
+uint64_t batch_rips[BATCH_SIZE];
 
 // Some compute function
 // Increment 'a' by at most COMPUTE * 4: the return value is still random
@@ -42,13 +43,18 @@ int hash(int a)
 // Process BATCH_SIZE pkts starting from lo
 int process_pkts_in_batch(int *pkt_lo)
 {
-	uint64_t my_rip;
-	asm ("lea (%%rip), %0" : "=r"(my_rip));
+	int index = 3;
 
-	printf("Doh doh\n");
+	asm("lea (%%rip), %%rax\n\t"		// Avoid rip corruption due to batch_rips[0] evaluation
+		"mov %%rax, %0"
+		: "=r"(batch_rips[index]) :: "rax");
+
+	printf("Doh Doh\n");
 	sleep(1);
-	asm ("mov %0, %%rax" :: "r" (my_rip) : "rax");
-	asm ("jmp *%rax");
+
+	asm("mov %0, %%rax\n\t"
+		"jmp *%%rax" 
+		:: "r" (batch_rips[index]) : "rax");
 
 }
 
