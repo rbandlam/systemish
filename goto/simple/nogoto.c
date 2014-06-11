@@ -10,7 +10,6 @@
 // Each packet contains a random integer. The memory address accessed
 // by the packet is determined by an expensive hash of the integer.
 
-#define G_2_ ((2 * 1024 * 1024 * 1024) - 1)
 int sum = 0;
 
 int *ht_log;
