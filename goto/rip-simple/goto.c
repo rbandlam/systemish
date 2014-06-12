@@ -24,13 +24,12 @@ int *pkts;
 #define BATCH_SIZE 8
 #define BATCH_SIZE_ 7
 
-int batch_index = 0;
 uint64_t batch_rips[BATCH_SIZE];
 
-#define PAUSE(index) \
-	asm("lea (%%rip), %%rax\n\t" "mov %%rax, %0" : "=r"(batch_rips[index]) :: "rax");
+#define STORE_RIP(index) \
+	asm("lea (%%rip), %%rax\n\t" "mov %%rax, %0\n\t" : "=r"(batch_rips[index]) :: "rax");
 
-#define UNPAUSE(index) \
+#define LOAD_RIP(index) \
 	asm("mov %0, %%rax\n\t" "jmp *%%rax" :: "r" (batch_rips[index]) : "rax");
 
 // Some compute function
@@ -49,11 +48,31 @@ int hash(int a)
 // Process BATCH_SIZE pkts starting from lo
 int process_pkts_in_batch(int *pkt_lo)
 {
-	int index = 3;
-	PAUSE(index);
-	printf("Doh\n");
-	sleep(1);
-	UNPAUSE(index);
+	int batch_index = 0;
+	int __mem_addr[BATCH_SIZE];
+	int __i;
+
+	// Like a foreach loop
+	for(__i = 0; __i < BATCH_SIZE; __i ++) {
+		batch_rips[__i] = (uint64_t) &&label_0;
+	}
+
+label_0:
+	__mem_addr[batch_index] = hash(pkt_lo[batch_index]) & LOG_CAP_;
+	__builtin_prefetch(&ht_log[__mem_addr[batch_index]]);
+	batch_rips[batch_index] = (uint64_t) &&label_1;
+	
+	batch_index = (batch_index + 1) & BATCH_SIZE_;
+	if(batch_index != 0) {
+		LOAD_RIP(batch_index);
+	}
+
+label_1:	
+	sum += ht_log[__mem_addr[batch_index]];
+	batch_index = (batch_index + 1) & BATCH_SIZE_;
+	if(batch_index != 0) {
+		LOAD_RIP(batch_index);
+	}
 }
 
 int main(int argc, char **argv)
