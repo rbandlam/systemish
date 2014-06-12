@@ -27,6 +27,12 @@ int *pkts;
 int batch_index = 0;
 uint64_t batch_rips[BATCH_SIZE];
 
+#define PAUSE(index) \
+	asm("lea (%%rip), %%rax\n\t" "mov %%rax, %0" : "=r"(batch_rips[index]) :: "rax");
+
+#define UNPAUSE(index) \
+	asm("mov %0, %%rax\n\t" "jmp *%%rax" :: "r" (batch_rips[index]) : "rax");
+
 // Some compute function
 // Increment 'a' by at most COMPUTE * 4: the return value is still random
 int hash(int a)
@@ -44,18 +50,10 @@ int hash(int a)
 int process_pkts_in_batch(int *pkt_lo)
 {
 	int index = 3;
-
-	asm("lea (%%rip), %%rax\n\t"		// Avoid rip corruption due to batch_rips[0] evaluation
-		"mov %%rax, %0"
-		: "=r"(batch_rips[index]) :: "rax");
-
-	printf("Doh Doh\n");
+	PAUSE(index);
+	printf("Doh\n");
 	sleep(1);
-
-	asm("mov %0, %%rax\n\t"
-		"jmp *%%rax" 
-		:: "r" (batch_rips[index]) : "rax");
-
+	UNPAUSE(index);
 }
 
 int main(int argc, char **argv)
