@@ -31,46 +31,61 @@ int *pkts;
 #define DEPTH 4
 
 int sum = 0;
-int batch_index = 0;
 
 // Process BATCH_SIZE pkts starting from lo
 int process_pkts_in_batch(int *pkt_lo)
 {
-	// Like a foreach loop
-	
-	int __i[BATCH_SIZE], __jumper[BATCH_SIZE], __j[BATCH_SIZE], __best_j[BATCH_SIZE];
+	int I = 0;			// batch index
+	void *batch_rips[BATCH_SIZE];		// goto targets
+
+	int __i[BATCH_SIZE];
+	int __jumper[BATCH_SIZE];
+	int *__arr[BATCH_SIZE];
+	int __j[BATCH_SIZE];
+	int __best_j[BATCH_SIZE];
 	int __max_diff[BATCH_SIZE];
-	struct cache_bkt *__bkt[BATCH_SIZE];
 
-	int batch_index = 0;
+	int __temp_index;
+	for(__temp_index = 0; __temp_index < BATCH_SIZE; __temp_index ++) {
+		batch_rips[__temp_index] = &&label_0;
+	}
 
-label1:		
-	__jumper[batch_index] = pkt_lo[batch_index];
+label_0:
+	
+	__jumper[I] = pkt_lo[I];
 			
-	for(i = 0; i < DEPTH; i++) {
-		__builtin_prefetch(&cache[__jumper[batch_index]]);
-		batch_index = (batch_index + 1) & BATCH_SIZE_;
-		if(batch_index != 0) {
-			goto label1;
+	for(__i[I] = 0; __i[I] < DEPTH; __i[I] ++) {
+		__builtin_prefetch(&cache[__jumper[I]]);
+		batch_rips[I] = &&label_1;
+
+		I = (I + 1) & BATCH_SIZE_;
+		if(I != 0) {
+			goto *batch_rips[I];
 		}
+			
+label_1:
+		__arr[I] = cache[__jumper[I]].slot_arr;
+		__best_j[I] = 0;
 
-		__bkt[batch_index] = &cache[__jumper[batch_index]];
-label2:
-		int j, best_j = 0;
+		__max_diff[I] = __arr[I][0] - __jumper[I];
 
-		int max_diff = bkt->slot_arr[0] - jumper;
-
-		for(j = 1; j < SLOTS_PER_BKT; j ++) {
-			if(bkt->slot_arr[j] - jumper > max_diff) {
-				max_diff = bkt->slot_arr[j] - jumper;
-				best_j = j;
+		for(__j[I] = 1; __j[I] < SLOTS_PER_BKT; __j[I] ++) {
+			if(__arr[I][__j[I]] - __jumper[I] > __max_diff[I]) {
+				__max_diff[I] = __arr[I][__j[I]] - __jumper[I];
+				__best_j[I] = __j[I];
 			}
 		}
 		
-		jumper = bkt->slot_arr[best_j];
+		__jumper[I] = __arr[I][__best_j[I]];
 	}
 
-	sum += jumper;
+	sum += __jumper[I];
+
+	//printf("Here for pkt %d\n", I);
+	I = (I + 1) & BATCH_SIZE_;
+	if(I != 0) {
+		goto *batch_rips[I];
+	}
 }
 
 int main(int argc, char **argv)

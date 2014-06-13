@@ -31,11 +31,11 @@ int *pkts;
 #define DEPTH 4
 
 int sum = 0;
-int batch_index = 0;
 
 // Process BATCH_SIZE pkts starting from lo
 int process_pkts_in_batch(int *pkt_lo)
 {
+	int batch_index = 0;
 	// Like a foreach loop
 	for(batch_index = 0; batch_index < BATCH_SIZE; batch_index ++) {
 		
@@ -43,19 +43,19 @@ int process_pkts_in_batch(int *pkt_lo)
 		int jumper = pkt_lo[batch_index];
 			
 		for(i = 0; i < DEPTH; i++) {
-			struct cache_bkt *bkt = &cache[jumper];
+			int *arr = cache[jumper].slot_arr;
 			int j, best_j = 0;
 
-			int max_diff = bkt->slot_arr[0] - jumper;
+			int max_diff = arr[0] - jumper;
 
 			for(j = 1; j < SLOTS_PER_BKT; j ++) {
-				if(bkt->slot_arr[j] - jumper > max_diff) {
-					max_diff = bkt->slot_arr[j] - jumper;
+				if(arr[j] - jumper > max_diff) {
+					max_diff = arr[j] - jumper;
 					best_j = j;
 				}
 			}
 			
-			jumper = bkt->slot_arr[best_j];
+			jumper = arr[best_j];
 		}
 
 		sum += jumper;
