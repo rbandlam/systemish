@@ -1,12 +1,10 @@
-for compute in `seq 1 5 50`; do
+for compute in `seq 1 1 50`; do
 	echo "#define COMPUTE $compute" > param.h
-	make
+	make > /dev/null
 
-	echo "COMPUTE = $compute, nogoto:"
 	nogoto_result=`./nogoto 2>/dev/null`
 	nogoto_time=`echo $nogoto_result | cut -d' ' -f 3`
 
-	echo "COMPUTE = $compute, goto:"
 	goto_result=`./goto 2>/dev/null`
 	goto_time=`echo $goto_result | cut -d' ' -f 3`
 

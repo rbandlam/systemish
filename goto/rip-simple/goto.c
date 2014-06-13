@@ -24,13 +24,6 @@ int *pkts;
 #define BATCH_SIZE 8
 #define BATCH_SIZE_ 7
 
-uint64_t batch_rips[BATCH_SIZE];
-
-#define STORE_RIP(index) \
-	asm("lea (%%rip), %%rax\n\t" "mov %%rax, %0\n\t" : "=r"(batch_rips[index]) :: "rax");
-
-#define LOAD_RIP(index) \
-	asm("mov %0, %%rax\n\t" "jmp *%%rax" :: "r" (batch_rips[index]) : "rax");
 
 // Some compute function
 // Increment 'a' by at most COMPUTE * 4: the return value is still random
@@ -51,27 +44,27 @@ int process_pkts_in_batch(int *pkt_lo)
 	int batch_index = 0;
 	int __mem_addr[BATCH_SIZE];
 	int __i;
+	void* batch_rips[BATCH_SIZE];
 
-	// Like a foreach loop
 	for(__i = 0; __i < BATCH_SIZE; __i ++) {
-		batch_rips[__i] = (uint64_t) &&label_0;
+		batch_rips[__i] = &&label_0;
 	}
 
 label_0:
 	__mem_addr[batch_index] = hash(pkt_lo[batch_index]) & LOG_CAP_;
 	__builtin_prefetch(&ht_log[__mem_addr[batch_index]]);
-	batch_rips[batch_index] = (uint64_t) &&label_1;
+	batch_rips[batch_index] = &&label_1;
 	
 	batch_index = (batch_index + 1) & BATCH_SIZE_;
 	if(batch_index != 0) {
-		LOAD_RIP(batch_index);
+		goto *batch_rips[batch_index];
 	}
 
 label_1:	
 	sum += ht_log[__mem_addr[batch_index]];
 	batch_index = (batch_index + 1) & BATCH_SIZE_;
 	if(batch_index != 0) {
-		LOAD_RIP(batch_index);
+		goto *batch_rips[batch_index];
 	}
 }
 
