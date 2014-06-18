@@ -7,10 +7,6 @@
 
 #include "param.h"
 
-// Each packet contains a random integer. The memory address accessed
-// by the packet is determined by an expensive hash of the integer.
-
-#define SLOTS_PER_BKT 16
 
 struct cache_bkt		/* 64 bytes */
 {
@@ -19,16 +15,13 @@ struct cache_bkt		/* 64 bytes */
 struct cache_bkt *cache;
 
 #define CACHE_SID 1
-#define NUM_BS (2 * 1024 * 1024)		// Number of cache buckets (avoiding BKTS)
-#define NUM_BS_ ((2 * 1024 * 1024) - 1)
+#define NUM_BS (1024 * 1024)		// Number of cache buckets (avoiding BKTS)
+#define NUM_BS_ ((1024 * 1024) - 1)
 
+// Each packet contains a random integer. The memory address accessed
+// by the packet is determined by an expensive hash of the integer.
 int *pkts;
 #define NUM_PKTS (1024 * 1024)
-
-#define BATCH_SIZE 8
-#define BATCH_SIZE_ 7
-
-#define DEPTH 4
 
 int sum = 0;
 
@@ -93,6 +86,8 @@ int main(int argc, char **argv)
 	int i, j;
 
 	// Allocate a large memory area
+	fprintf(stderr, "Size of cache = %lu\n", NUM_BS * sizeof(struct cache_bkt));
+
 	int sid = shmget(CACHE_SID, NUM_BS * sizeof(struct cache_bkt), 
 		IPC_CREAT | 0666 | SHM_HUGETLB);
 	if(sid < 0) {
