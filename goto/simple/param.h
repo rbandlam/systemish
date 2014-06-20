@@ -1,1 +1,1 @@
-#define COMPUTE 21
+#define COMPUTE 16

@@ -21,7 +21,6 @@ struct cache_bkt *cache;
 // Each packet contains a random integer. The memory address accessed
 // by the packet is determined by an expensive hash of the integer.
 int *pkts;
-#define NUM_PKTS (1024 * 1024)
 
 int sum = 0;
 
