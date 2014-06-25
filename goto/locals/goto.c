@@ -51,6 +51,16 @@ int process_pkts_in_batch(int *pkt_lo)
 	int a_8[BATCH_SIZE];
 	int a_9[BATCH_SIZE];
 	int a_10[BATCH_SIZE];
+	int a_11[BATCH_SIZE];
+	int a_12[BATCH_SIZE];
+	int a_13[BATCH_SIZE];
+	int a_14[BATCH_SIZE];
+	int a_15[BATCH_SIZE];
+	int a_16[BATCH_SIZE];
+	int a_17[BATCH_SIZE];
+	int a_18[BATCH_SIZE];
+	int a_19[BATCH_SIZE];
+	int a_20[BATCH_SIZE];
 
 	int temp_index;
 	for(temp_index = 0; temp_index < BATCH_SIZE; temp_index ++) {
@@ -69,6 +79,16 @@ label_0:
 	a_8[I] = hash(a_7[I]) & LOG_CAP_;
 	a_9[I] = hash(a_8[I]) & LOG_CAP_;
 	a_10[I] = hash(a_9[I]) & LOG_CAP_;
+	a_11[I] = hash(a_10[I]) & LOG_CAP_;
+	a_12[I] = hash(a_11[I]) & LOG_CAP_;
+	a_13[I] = hash(a_12[I]) & LOG_CAP_;
+	a_14[I] = hash(a_13[I]) & LOG_CAP_;
+	a_15[I] = hash(a_14[I]) & LOG_CAP_;
+	a_16[I] = hash(a_15[I]) & LOG_CAP_;
+	a_17[I] = hash(a_16[I]) & LOG_CAP_;
+	a_18[I] = hash(a_17[I]) & LOG_CAP_;
+	a_19[I] = hash(a_18[I]) & LOG_CAP_;
+	a_20[I] = hash(a_19[I]) & LOG_CAP_;
 	
 	__builtin_prefetch(&ht_log[a_10[I]], 0, 0);
 	batch_rips[I] = &&label_1;
