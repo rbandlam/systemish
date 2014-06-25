@@ -73,7 +73,6 @@ label_1:
 
 	sum += __jumper[I];
 
-	//printf("Here for pkt %d\n", I);
 	I = (I + 1) & BATCH_SIZE_;
 	if(I != 0) {
 		goto *batch_rips[I];

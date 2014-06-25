@@ -4,4 +4,4 @@
 #define BATCH_SIZE_ 7
 
 #define DEPTH 4
-#define NUM_PKTS (64 * 1024 * 1024)
+#define NUM_PKTS (8 * 1024 * 1024)
