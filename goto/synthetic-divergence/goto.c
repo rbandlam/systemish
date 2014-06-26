@@ -18,6 +18,16 @@ struct cache_bkt *cache;
 
 #define ABS(a) (a > 0 ? a : -1 * a)
 
+// Prefetch, Save, and Switch
+#define PSS(addr, label) \
+do {\
+	__builtin_prefetch(addr); \
+	batch_rips[I] = &&label; \
+	I = (I + 1) & BATCH_SIZE_;	\
+	goto *batch_rips[I]; \
+} while(0)
+	 
+
 // Each packet contains a random integer. The memory address accessed
 // by the packet is determined by an expensive hash of the integer.
 int *pkts;
@@ -48,11 +58,7 @@ label_0:
 	__jumper[I] = pkt_lo[I];
 			
 	for(__i[I] = 0; __i[I] < DEPTH; __i[I] ++) {
-		__builtin_prefetch(&cache[__jumper[I]]);
-		batch_rips[I] = &&label_1;
-
-		I = (I + 1) & BATCH_SIZE_;
-		goto *batch_rips[I];
+		PSS(&cache[__jumper[I]], label_1);
 			
 label_1:
 		__arr[I] = cache[__jumper[I]].slot_arr;
