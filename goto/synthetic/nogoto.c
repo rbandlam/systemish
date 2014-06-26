@@ -28,7 +28,6 @@ int sum = 0;
 int process_pkts_in_batch(int *pkt_lo)
 {
 	int batch_index = 0;
-	// Like a foreach loop
 	for(batch_index = 0; batch_index < BATCH_SIZE; batch_index ++) {
 		
 		int i;

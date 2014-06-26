@@ -7,19 +7,16 @@
 
 #include "param.h"
 
-
 struct cache_bkt		/* 64 bytes */
 {
 	int slot_arr[SLOTS_PER_BKT];
 };
 struct cache_bkt *cache;
 
-#define CACHE_SID 1
-#define NUM_BS (1024 * 1024)		// Number of cache buckets (avoiding BKTS)
-#define NUM_BS_ ((1024 * 1024) - 1)
-
 #define ISSET(n, i) (n & (1 << i))	// Is the ith bit of n == 1
 #define SET(n, i) (n | (1 << i))	// Is the ith bit of n == 1
+
+#define ABS(a) (a > 0 ? a : -1 * a)
 
 // Each packet contains a random integer. The memory address accessed
 // by the packet is determined by an expensive hash of the integer.
@@ -61,22 +58,21 @@ label_1:
 		__arr[I] = cache[__jumper[I]].slot_arr;
 		__best_j[I] = 0;
 
-		__max_diff[I] = __arr[I][0] - __jumper[I];
+		__max_diff[I] = ABS(__arr[I][0] - __jumper[I]) % 8;
 
 		for(__j[I] = 1; __j[I] < SLOTS_PER_BKT; __j[I] ++) {
-			if(__arr[I][__j[I]] - __jumper[I] > __max_diff[I]) {
-				__max_diff[I] = __arr[I][__j[I]] - __jumper[I];
+			if(ABS(__arr[I][__j[I]] - __jumper[I]) % 8 > __max_diff[I]) {
+				__max_diff[I] = ABS(__arr[I][__j[I]] - __jumper[I]) % 8;
 				__best_j[I] = __j[I];
 			}
 		}
 		
 		__jumper[I] = __arr[I][__best_j[I]];
 		if(__jumper[I] % 16 == 0) {
-			goto bad_jumper;
+			break;
 		}
 	}
 
-bad_jumper:
 	sum += __jumper[I];
 
 end:

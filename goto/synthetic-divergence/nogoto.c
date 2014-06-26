@@ -7,16 +7,13 @@
 
 #include "param.h"
 
-
 struct cache_bkt		/* 64 bytes */
 {
 	int slot_arr[SLOTS_PER_BKT];
 };
 struct cache_bkt *cache;
 
-#define CACHE_SID 1
-#define NUM_BS (1024 * 1024)		// Number of cache buckets (avoiding BKTS)
-#define NUM_BS_ ((1024 * 1024) - 1)
+#define ABS(a) (a > 0 ? a : -1 * a)
 
 // Each packet contains a random integer. The memory address accessed
 // by the packet is determined by an expensive hash of the integer.
@@ -38,11 +35,11 @@ int process_pkts_in_batch(int *pkt_lo)
 			int *arr = cache[jumper].slot_arr;
 			int j, best_j = 0;
 
-			int max_diff = arr[0] - jumper;
+			int max_diff = ABS(arr[0] - jumper) % 8;
 
 			for(j = 1; j < SLOTS_PER_BKT; j ++) {
-				if(arr[j] - jumper > max_diff) {
-					max_diff = arr[j] - jumper;
+				if(ABS(arr[j] - jumper) % 8 > max_diff) {
+					max_diff = ABS(arr[j] - jumper) % 8;
 					best_j = j;
 				}
 			}
