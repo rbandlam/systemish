@@ -7,6 +7,8 @@
 
 #include "param.h"
 
+#define foreach(i, n) for(i = 0; i < n; i ++)
+
 struct cache_bkt		/* 64 bytes */
 {
 	int slot_arr[SLOTS_PER_BKT];
@@ -21,12 +23,14 @@ int *pkts;
 
 int sum = 0;
 
+// batch_index must be declared outside process_pkts_in_batch
+int batch_index = 0;
+
 // Process BATCH_SIZE pkts starting from lo
 int process_pkts_in_batch(int *pkt_lo)
 {
-	int batch_index = 0;
 	// Like a foreach loop
-	for(batch_index = 0; batch_index < BATCH_SIZE; batch_index ++) {
+	foreach(batch_index, BATCH_SIZE) {
 		
 		int i;
 		int jumper = pkt_lo[batch_index];
