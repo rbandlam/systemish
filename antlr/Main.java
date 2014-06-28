@@ -1,14 +1,11 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.List;
 import java.util.Scanner;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
@@ -34,7 +31,7 @@ public class Main {
 		ExtractLocalVariablesListener extractor = new ExtractLocalVariablesListener(parser);
 		walker.walk(extractor, tree);
 		
-		for(Pair localVar : extractor.ret) {
+		for(Pair<String, String> localVar : extractor.ret) {
 			System.out.println(localVar.toString());
 		}
 		return "";
