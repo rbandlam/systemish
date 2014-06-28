@@ -16,7 +16,6 @@ public class ExtractLocalVariablesListener extends CBaseListener {
 		ret = new LinkedList<Pair<String, String>>();
 	}
 
-	
 	 // declaration ~ declarationSpecifiers initDeclaratorList? ';'
 	 // initDeclarator ~ declarator | declarator '=' initializer
 	@Override
