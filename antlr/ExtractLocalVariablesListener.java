@@ -24,21 +24,20 @@ public class ExtractLocalVariablesListener extends CBaseListener {
 		String declarationSpecifier = spaceSeparate(ctx.declarationSpecifiers());
 		
 		// The identifiers declared	
-		extractDeclarators(ctx.initDeclaratorList(), declarationSpecifier); 
+		extractDeclarators(declarationSpecifier, ctx.initDeclaratorList()); 
 	}
 
 	// Extract the declarators in the declaration. The declaration has a list
 	// of initDeclarators, which we can pass recursively. It's hard to do this 
 	// iteratively because initDeclaratorList does not actually expose a List.
-	private void extractDeclarators(
-			CParser.InitDeclaratorListContext initDeclaratorList,
-			String declarationSpecifier) {
+	private void extractDeclarators(String declarationSpecifier,
+			CParser.InitDeclaratorListContext initDeclaratorList) {
 		if(initDeclaratorList == null) {
 			return;
 		}
-		ret.add(new Pair<String, String>(initDeclaratorList.initDeclarator().declarator().getText(),
-				declarationSpecifier));
-		extractDeclarators(initDeclaratorList.initDeclaratorList(), declarationSpecifier);
+		ret.add(new Pair<String, String>(declarationSpecifier,
+				initDeclaratorList.initDeclarator().declarator().getText()));
+		extractDeclarators(declarationSpecifier, initDeclaratorList.initDeclaratorList());
 	}
 
 	// Return a space-separate list of the tokens in this ParserRuleContext

@@ -37,7 +37,6 @@ public class Main {
 		walker.walk(extractor, tree);
 		
 		System.out.println(rewriter.getText());
-		
 	}
 
 	private static String moveLocalVarsToTop(String code) {
