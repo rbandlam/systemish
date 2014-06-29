@@ -53,7 +53,7 @@ public class Main {
 		walker.walk(extractor, tree);
 		
 		for(VariableDecl var : extractor.ret) {
-			System.out.println(var.toString());
+			System.out.println(var.type + " " + var.name + "[BATCH_SIZE];");
 		}
 		return "";
 	}

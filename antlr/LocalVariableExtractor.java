@@ -24,7 +24,7 @@ public class LocalVariableExtractor extends CBaseListener {
 	public void enterDeclaration(CParser.DeclarationContext ctx) {
 		// The type of the declaration (for example, volatile int*)
 		String declarationSpecifier = spaceSeparate(ctx.declarationSpecifiers());
-		debug.println("LocalVariableExtractor found declarationSpecifier `" + 
+		debug.println("LocalVariableExtractor found declarationSpecifier: `" + 
 				declarationSpecifier + "`" );
 		
 		// The identifiers declared	
@@ -47,7 +47,7 @@ public class LocalVariableExtractor extends CBaseListener {
 		
 		VariableDecl var = new VariableDecl(declarationSpecifier, declarator, initializer);
 		ret.add(var);
-		debug.println("\tLocalVariableExtractor found declaration " + var.toString());
+		debug.println("\tLocalVariableExtractor found declaration: " + var.toString());
 
 		extractDeclarators(declarationSpecifier, initDeclaratorList.initDeclaratorList());
 	}

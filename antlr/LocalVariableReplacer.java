@@ -19,20 +19,32 @@ public class LocalVariableReplacer extends CBaseListener {
 	 // initDeclarator ~ declarator | declarator '=' initializer
 	@Override
 	public void enterDeclaration(CParser.DeclarationContext ctx) {
-		if(ctx.initDeclaratorList() == null) {
-			debug.println("LocalVariableReplacer deleting declaration " + spaceSeparate(ctx));
-			rewriter.delete(ctx.start, ctx.stop);
-		} else {
-			// The type of the declaration (for example, volatile int*)
-			String declarationSpecifier = spaceSeparate(ctx.declarationSpecifiers());
-			rewriter.delete(ctx.declarationSpecifiers().start, ctx.declarationSpecifiers().stop);
-			debug.println("LocalVariableReplacer deleting declarationSpecifier `" + 
-				declarationSpecifier + "`" );
-		}
-		// The identifiers declared	
-		//extractDeclarators(declarationSpecifier, ctx.initDeclaratorList()); 
+		
+		String declarationSpecifier = spaceSeparate(ctx.declarationSpecifiers());
+		rewriter.delete(ctx.declarationSpecifiers().start, ctx.declarationSpecifiers().stop);
+		debug.println("LocalVariableReplacer deleting declarationSpecifier: `" + 
+			declarationSpecifier + "`" );
+		
+		deleteNonInitializedDeclarators(ctx.initDeclaratorList());
 	}
 	
+	private void deleteNonInitializedDeclarators(
+			CParser.InitDeclaratorListContext ctx) {
+		CParser.InitDeclaratorContext idc = ctx.initDeclarator();
+		CParser.InitializerContext ic = idc.initializer();
+		if(ic == null) {
+			debug.println("LocalVariableReplacer deleting non-initialized declarator: `" + 
+					spaceSeparate(idc));
+			rewriter.delete(idc.start, idc.stop);
+		}
+		
+		if(ctx.initDeclaratorList() == null) {
+			return;
+		}
+		
+		deleteNonInitializedDeclarators(ctx.initDeclaratorList());
+	}
+
 	// Return a space-separate list of the tokens in this ParserRuleContext
 	private String spaceSeparate(ParserRuleContext ctx) {
 		int startIndex = ctx.getStart().getTokenIndex();
