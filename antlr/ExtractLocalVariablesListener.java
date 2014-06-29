@@ -48,7 +48,7 @@ public class ExtractLocalVariablesListener extends CBaseListener {
 
 		String ret = "";
 		for(int i = startIndex; i <= stopIndex; i ++) {
-			ret = ret + tokens.get(i).getText() + " ";	
+			ret = ret + tokens.get(i).getText() + "";	
 		}
 		
 		return ret;

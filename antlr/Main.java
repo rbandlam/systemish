@@ -37,10 +37,7 @@ public class Main {
 		walker.walk(extractor, tree);
 		
 		System.out.println(rewriter.getText());
-		TokenStream newTokenStream = rewriter.getTokenStream();
-		for(int i = 0; i < newTokenStream.size(); i ++) {
-			System.out.print(newTokenStream.get(i).getText() + " ");
-		}
+		
 	}
 
 	private static String moveLocalVarsToTop(String code) {

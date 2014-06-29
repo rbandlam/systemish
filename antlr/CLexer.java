@@ -561,8 +561,8 @@ public class CLexer extends Lexer {
 		"\u03c3\u03d0\u03d7\u03db\u03dd\u03e7\u03eb\u03ef\u03f2\u03f7\u03f9\u03ff"+
 		"\u0405\u0407\u040a\u0411\u0415\u041a\u041d\u0424\u0427\u042e\u0432\u0437"+
 		"\u043a\u043f\u0459\u045e\u0462\u0468\u0478\u0480\u0483\u0487\u048e\u0493"+
-		"\u0497\u049b\u049f\u04a5\u04ac\u04b9\u04c1\u04c7\u04ca\u04d4\u04e2\3\b"+
-		"\2\2";
+		"\u0497\u049b\u049f\u04a5\u04ac\u04b9\u04c1\u04c7\u04ca\u04d4\u04e2\3\2"+
+		"\5\2";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
