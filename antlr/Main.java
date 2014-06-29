@@ -11,7 +11,6 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Main {
-	static int debug = 1;
 	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/goto.c";
 	
 	public static void main(String args[]) throws FileNotFoundException {
@@ -31,8 +30,7 @@ public class Main {
 		// Parse and get the root of the parse tree
 		ParserRuleContext tree = parser.compilationUnit();
 
-		LocalVariableReplacer replacer = new LocalVariableReplacer(parser, 
-				rewriter, debug);
+		LocalVariableReplacer replacer = new LocalVariableReplacer(parser, rewriter);
 		
 		ParseTreeWalker walker = new ParseTreeWalker();
 		walker.walk(replacer, tree);
@@ -51,7 +49,7 @@ public class Main {
 		ParserRuleContext tree = parser.compilationUnit();
 
 		ParseTreeWalker walker = new ParseTreeWalker();
-		LocalVariableExtractor extractor = new LocalVariableExtractor(parser, debug);
+		LocalVariableExtractor extractor = new LocalVariableExtractor(parser);
 		walker.walk(extractor, tree);
 		
 		for(Pair<String, String> localVar : extractor.ret) {

@@ -5,18 +5,18 @@ public class LocalVariableReplacer extends CBaseListener {
 	CParser parser;
 	TokenStream tokens;
 	TokenStreamRewriter rewriter;
-	int debug;
+	Debug debug;
 	
-	public LocalVariableReplacer(CParser parser, 
-			TokenStreamRewriter rewriter, int debug) {
+	public LocalVariableReplacer(CParser parser, TokenStreamRewriter rewriter) {
 		this.parser = parser;
 		tokens = parser.getTokenStream();
 		this.rewriter = rewriter;
-		this.debug = debug;
+		this.debug = new Debug();
 	}
 
 	@Override
 	public void enterInitDeclarator(CParser.InitDeclaratorContext ctx) {
+		debug.println("LocalVariableReplacer replacing " + ctx.start.getText());
 		rewriter.replace(ctx.start, "baa baa");
 	}
 }

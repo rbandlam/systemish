@@ -9,13 +9,13 @@ public class LocalVariableExtractor extends CBaseListener {
 	CParser parser;
 	TokenStream tokens;
 	Queue<Pair<String, String>> ret;		// Type, Identifier
-	int debug;
+	Debug debug;
 	
-	public LocalVariableExtractor(CParser parser, int debug) {
+	public LocalVariableExtractor(CParser parser) {
 		this.parser = parser;
 		tokens = parser.getTokenStream();
 		ret = new LinkedList<Pair<String, String>>();
-		this.debug = debug;
+		this.debug = new Debug();
 	}
 
 	 // declaration ~ declarationSpecifiers initDeclaratorList? ';'
@@ -24,6 +24,8 @@ public class LocalVariableExtractor extends CBaseListener {
 	public void enterDeclaration(CParser.DeclarationContext ctx) {
 		// The type of the declaration (for example, volatile int*)
 		String declarationSpecifier = spaceSeparate(ctx.declarationSpecifiers());
+		debug.println("LocalVariableExtractor found declarationSpecifier `" + 
+				declarationSpecifier + "`" );
 		
 		// The identifiers declared	
 		extractDeclarators(declarationSpecifier, ctx.initDeclaratorList()); 
@@ -37,8 +39,9 @@ public class LocalVariableExtractor extends CBaseListener {
 		if(initDeclaratorList == null) {
 			return;
 		}
-		ret.add(new Pair<String, String>(declarationSpecifier,
-				initDeclaratorList.initDeclarator().declarator().getText()));
+		String declarator = initDeclaratorList.initDeclarator().declarator().getText();
+		debug.println("\tLocalVariableExtractor found declarator `" + declarator + "`");
+		ret.add(new Pair<String, String>(declarationSpecifier, declarator));
 		extractDeclarators(declarationSpecifier, initDeclaratorList.initDeclaratorList());
 	}
 
