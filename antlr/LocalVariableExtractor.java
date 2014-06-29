@@ -5,15 +5,17 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.misc.Pair;
 
-public class ExtractLocalVariablesListener extends CBaseListener {
+public class LocalVariableExtractor extends CBaseListener {
 	CParser parser;
 	TokenStream tokens;
 	Queue<Pair<String, String>> ret;		// Type, Identifier
+	int debug;
 	
-	public ExtractLocalVariablesListener(CParser parser) {
+	public LocalVariableExtractor(CParser parser, int debug) {
 		this.parser = parser;
 		tokens = parser.getTokenStream();
 		ret = new LinkedList<Pair<String, String>>();
+		this.debug = debug;
 	}
 
 	 // declaration ~ declarationSpecifiers initDeclaratorList? ';'

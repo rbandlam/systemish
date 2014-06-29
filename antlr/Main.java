@@ -6,12 +6,12 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Main {
+	static int debug = 1;
 	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/goto.c";
 	
 	public static void main(String args[]) throws FileNotFoundException {
@@ -31,10 +31,11 @@ public class Main {
 		// Parse and get the root of the parse tree
 		ParserRuleContext tree = parser.compilationUnit();
 
-		LocalVariableReplacer extractor = new LocalVariableReplacer(parser, rewriter);
+		LocalVariableReplacer replacer = new LocalVariableReplacer(parser, 
+				rewriter, debug);
 		
 		ParseTreeWalker walker = new ParseTreeWalker();
-		walker.walk(extractor, tree);
+		walker.walk(replacer, tree);
 		
 		System.out.println(rewriter.getText());
 	}
@@ -50,7 +51,7 @@ public class Main {
 		ParserRuleContext tree = parser.compilationUnit();
 
 		ParseTreeWalker walker = new ParseTreeWalker();
-		ExtractLocalVariablesListener extractor = new ExtractLocalVariablesListener(parser);
+		LocalVariableExtractor extractor = new LocalVariableExtractor(parser, debug);
 		walker.walk(extractor, tree);
 		
 		for(Pair<String, String> localVar : extractor.ret) {
