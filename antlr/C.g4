@@ -175,7 +175,7 @@ constantExpression
     ;
 
 declaration
-    :   declarationSpecifiers initDeclaratorList? ';'
+    :   declarationSpecifiers initDeclaratorList ';'
     |   staticAssertDeclaration
     ;
 
@@ -224,6 +224,7 @@ typeSpecifier
     |   'double'
     |   'signed'
     |   'unsigned'
+    |	'size_t'
     |   '_Bool'
     |   '_Complex'
     |   '__m128'
