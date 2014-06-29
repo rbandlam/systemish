@@ -224,7 +224,6 @@ typeSpecifier
     |   'double'
     |   'signed'
     |   'unsigned'
-    |	'size_t'
     |   '_Bool'
     |   '_Complex'
     |   '__m128'
