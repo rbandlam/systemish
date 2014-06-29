@@ -25,21 +25,33 @@ public class LocalVariableReplacer extends CBaseListener {
 		debug.println("LocalVariableReplacer deleting declarationSpecifier: `" + 
 			declarationSpecifier + "`" );
 		
-		// Delete the space after the declarationSpecifier
+		// Delete the mandatory space after the declarationSpecifier
 		int stopIndex = ctx.declarationSpecifiers().stop.getTokenIndex();
+		debug.println("LocalVariableReplacer deleting useless " + tokens.get(stopIndex).getText());
 		rewriter.delete(stopIndex + 1);
 		
 		deleteNonInitializedDeclarators(ctx.initDeclaratorList());
 	}
 	
-	private void deleteNonInitializedDeclarators(
-			CParser.InitDeclaratorListContext ctx) {
+	private void deleteNonInitializedDeclarators(CParser.InitDeclaratorListContext ctx) {
 		CParser.InitDeclaratorContext idc = ctx.initDeclarator();
 		CParser.InitializerContext ic = idc.initializer();
 		if(ic == null) {
 			debug.println("\tLocalVariableReplacer deleting non-initialized declarator: `" + 
 					debug.btrText(idc, tokens) + "`");
 			rewriter.delete(idc.start, idc.stop);
+			
+			// Delete commas and spaces after the non-initialized declarator
+			int stopIndex = idc.stop.getTokenIndex();
+			for(int i = stopIndex + 1; i < tokens.size(); i ++) {
+				String tokenString = tokens.get(i).getText();
+				if(tokenString.contains(" ") || tokenString.contains(",")) {
+					debug.println("\tLocalVariableReplacer deleting useless `" + tokenString + "`");
+					rewriter.delete(i);
+				} else {
+					break;
+				}
+			}
 		}
 		
 		if(ctx.initDeclaratorList() == null) {

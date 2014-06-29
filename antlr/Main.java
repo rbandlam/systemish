@@ -10,7 +10,7 @@ import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Main {
-	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/cuckoo.c";
+	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/cuckoo2.c";
 	
 	public static void main(String args[]) throws FileNotFoundException {
 		String code = getCode(gotoFilePath);
