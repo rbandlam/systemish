@@ -1,14 +1,11 @@
 import java.util.LinkedList;
-import java.util.Queue;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.misc.Pair;
 
 public class LocalVariableExtractor extends CBaseListener {
 	CParser parser;
 	TokenStream tokens;
-	Queue<VariableDecl> ret;		// Type, Identifier
+	LinkedList<VariableDecl> ret;		// Type, Identifier
 	Debug debug;
 	
 	public LocalVariableExtractor(CParser parser) {
@@ -46,7 +43,7 @@ public class LocalVariableExtractor extends CBaseListener {
 		}
 		
 		VariableDecl var = new VariableDecl(declarationSpecifier, declarator, initializer);
-		ret.add(var);
+		ret.addLast(var);
 		debug.println("\tLocalVariableExtractor found declaration: " + var.toString());
 
 		extractDeclarators(declarationSpecifier, initDeclaratorList.initDeclaratorList());

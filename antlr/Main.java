@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -14,8 +15,8 @@ public class Main {
 	
 	public static void main(String args[]) throws FileNotFoundException {
 		String code = getCode(gotoFilePath);
-		
-		extractLocalVariables(code);
+	
+		LinkedList<VariableDecl> localVars = extractLocalVariables(code);
 		code = replaceLocalVariables(code);
 
 		code = cleanup(code);
@@ -65,7 +66,7 @@ public class Main {
 		return rewriter.getText();
 	}
 
-	private static String extractLocalVariables(String code) {
+	private static LinkedList<VariableDecl> extractLocalVariables(String code) {
 		System.out.println("Extracting local variables");
 		
 		CharStream charStream = new ANTLRInputStream(code);
@@ -83,7 +84,7 @@ public class Main {
 		for(VariableDecl var : extractor.ret) {
 			System.out.println(var.type + " " + var.name + "[BATCH_SIZE];");
 		}
-		return "";
+		return extractor.ret;
 	}
 
 	// Get a String representation of the input code
