@@ -3,15 +3,16 @@ import org.antlr.v4.runtime.TokenStream;
 
 class Debug {
 	static int debug = 1;
-	
 	public void println(String s) {
 		if(debug == 1) {
+			System.out.flush();		// For ordering b/w stderr and stdout
 			System.err.println(s);
 		}
 	}
 	
 	public void print(String s) {
 		if(debug == 1) {
+			System.out.flush();
 			System.err.print(s);
 		}
 	}

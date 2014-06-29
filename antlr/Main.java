@@ -10,11 +10,12 @@ import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Main {
-	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/cuckoo2.c";
+	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/test.c";
 	
 	public static void main(String args[]) throws FileNotFoundException {
 		String code = getCode(gotoFilePath);
-		moveLocalVarsToTop(code);
+		
+		extractLocalVariables(code);
 		code = replaceLocalVariables(code);
 
 		code = cleanup(code);
@@ -24,8 +25,9 @@ public class Main {
 	
 	
 	private static String cleanup(String code) {
-		CharStream charStream = new ANTLRInputStream(code);
+		System.out.println("Running cleanup");
 		
+		CharStream charStream = new ANTLRInputStream(code);
 		CLexer lexer = new CLexer(charStream);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
@@ -44,8 +46,9 @@ public class Main {
 	}
 
 	private static String replaceLocalVariables(String code) {
-		CharStream charStream = new ANTLRInputStream(code);
-		
+		System.out.println("Replacing local variables");
+
+		CharStream charStream = new ANTLRInputStream(code);		
 		CLexer lexer = new CLexer(charStream);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
@@ -62,9 +65,10 @@ public class Main {
 		return rewriter.getText();
 	}
 
-	private static String moveLocalVarsToTop(String code) {
-		CharStream charStream = new ANTLRInputStream(code);
+	private static String extractLocalVariables(String code) {
+		System.out.println("Extracting local variables");
 		
+		CharStream charStream = new ANTLRInputStream(code);
 		CLexer lexer = new CLexer(charStream);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		CParser parser = new CParser(tokens);
