@@ -20,10 +20,14 @@ public class LocalVariableReplacer extends CBaseListener {
 	@Override
 	public void enterDeclaration(CParser.DeclarationContext ctx) {
 		
-		String declarationSpecifier = spaceSeparate(ctx.declarationSpecifiers());
+		String declarationSpecifier = debug.btrText(ctx.declarationSpecifiers(), tokens);
 		rewriter.delete(ctx.declarationSpecifiers().start, ctx.declarationSpecifiers().stop);
 		debug.println("LocalVariableReplacer deleting declarationSpecifier: `" + 
 			declarationSpecifier + "`" );
+		
+		// Delete the space after the declarationSpecifier
+		int stopIndex = ctx.declarationSpecifiers().stop.getTokenIndex();
+		rewriter.delete(stopIndex + 1);
 		
 		deleteNonInitializedDeclarators(ctx.initDeclaratorList());
 	}
@@ -33,8 +37,8 @@ public class LocalVariableReplacer extends CBaseListener {
 		CParser.InitDeclaratorContext idc = ctx.initDeclarator();
 		CParser.InitializerContext ic = idc.initializer();
 		if(ic == null) {
-			debug.println("LocalVariableReplacer deleting non-initialized declarator: `" + 
-					spaceSeparate(idc));
+			debug.println("\tLocalVariableReplacer deleting non-initialized declarator: `" + 
+					debug.btrText(idc, tokens) + "`");
 			rewriter.delete(idc.start, idc.stop);
 		}
 		
@@ -43,18 +47,5 @@ public class LocalVariableReplacer extends CBaseListener {
 		}
 		
 		deleteNonInitializedDeclarators(ctx.initDeclaratorList());
-	}
-
-	// Return a space-separate list of the tokens in this ParserRuleContext
-	private String spaceSeparate(ParserRuleContext ctx) {
-		int startIndex = ctx.getStart().getTokenIndex();
-		int stopIndex = ctx.getStop().getTokenIndex();
-
-		String ret = "";
-		for(int i = startIndex; i <= stopIndex; i ++) {
-			ret = ret + tokens.get(i).getText() + "";	
-		}
-			
-		return ret;
 	}
 }

@@ -23,7 +23,7 @@ public class LocalVariableExtractor extends CBaseListener {
 	@Override
 	public void enterDeclaration(CParser.DeclarationContext ctx) {
 		// The type of the declaration (for example, volatile int*)
-		String declarationSpecifier = spaceSeparate(ctx.declarationSpecifiers());
+		String declarationSpecifier = debug.btrText(ctx.declarationSpecifiers(), tokens);
 		debug.println("LocalVariableExtractor found declarationSpecifier: `" + 
 				declarationSpecifier + "`" );
 		
@@ -50,18 +50,5 @@ public class LocalVariableExtractor extends CBaseListener {
 		debug.println("\tLocalVariableExtractor found declaration: " + var.toString());
 
 		extractDeclarators(declarationSpecifier, initDeclaratorList.initDeclaratorList());
-	}
-
-	// Return a space-separate list of the tokens in this ParserRuleContext
-	private String spaceSeparate(ParserRuleContext ctx) {
-		int startIndex = ctx.getStart().getTokenIndex();
-		int stopIndex = ctx.getStop().getTokenIndex();
-
-		String ret = "";
-		for(int i = startIndex; i <= stopIndex; i ++) {
-			ret = ret + tokens.get(i).getText() + "";	
-		}
-		
-		return ret;
 	}
 }

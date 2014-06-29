@@ -2,7 +2,7 @@ static int _cuckoopath_search(cuckoo_hashtable_t *h,
                               size_t depth_start,
                               size_t *cp_index)
 {
-    int depth = depth_start;
+    int   depth = depth_start;
     
     while ((h->kick_count < MAX_CUCKOO_COUNT) && (depth >= 0) && (depth < MAX_CUCKOO_COUNT - 1))
     {

@@ -1,6 +1,9 @@
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.TokenStream;
+
 class Debug {
-	
 	static int debug = 1;
+	
 	public void println(String s) {
 		if(debug == 1) {
 			System.err.println(s);
@@ -11,6 +14,20 @@ class Debug {
 		if(debug == 1) {
 			System.err.print(s);
 		}
+	}
+	
+	// ParserRuleContext.getText() seems to ignore the hidden tokens
+	// Use this for printing contexts instead
+	public String btrText(ParserRuleContext ctx, TokenStream tokens) {
+		int startIndex = ctx.getStart().getTokenIndex();
+		int stopIndex = ctx.getStop().getTokenIndex();
+
+		String ret = "";
+		for(int i = startIndex; i <= stopIndex; i ++) {
+			ret = ret + tokens.get(i).getText() + "";	
+		}
+		
+		return ret;
 	}
 }
 

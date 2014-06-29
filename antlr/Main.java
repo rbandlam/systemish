@@ -10,15 +10,40 @@ import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Main {
-	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/test.c";
+	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/cuckoo.c";
 	
 	public static void main(String args[]) throws FileNotFoundException {
 		String code = getCode(gotoFilePath);
 		moveLocalVarsToTop(code);
-		replaceLocalVariables(code);
+		code = replaceLocalVariables(code);
+
+		code = cleanup(code);
+		
+		System.out.println(code);
 	}
 	
-	private static void replaceLocalVariables(String code) {
+	
+	private static String cleanup(String code) {
+		CharStream charStream = new ANTLRInputStream(code);
+		
+		CLexer lexer = new CLexer(charStream);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+		CParser parser = new CParser(tokens);
+		
+		// Parse and get the root of the parse tree
+		ParserRuleContext tree = parser.compilationUnit();
+
+		CodeCleaner cleaner = new CodeCleaner(parser, rewriter);
+		
+		ParseTreeWalker walker = new ParseTreeWalker();
+		walker.walk(cleaner, tree);
+		
+		return rewriter.getText();
+
+	}
+
+	private static String replaceLocalVariables(String code) {
 		CharStream charStream = new ANTLRInputStream(code);
 		
 		CLexer lexer = new CLexer(charStream);
@@ -34,7 +59,7 @@ public class Main {
 		ParseTreeWalker walker = new ParseTreeWalker();
 		walker.walk(replacer, tree);
 		
-		System.out.println(rewriter.getText());
+		return rewriter.getText();
 	}
 
 	private static String moveLocalVarsToTop(String code) {
