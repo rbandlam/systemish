@@ -8,13 +8,13 @@ import org.antlr.v4.runtime.misc.Pair;
 public class LocalVariableExtractor extends CBaseListener {
 	CParser parser;
 	TokenStream tokens;
-	Queue<Pair<String, String>> ret;		// Type, Identifier
+	Queue<VariableDecl> ret;		// Type, Identifier
 	Debug debug;
 	
 	public LocalVariableExtractor(CParser parser) {
 		this.parser = parser;
 		tokens = parser.getTokenStream();
-		ret = new LinkedList<Pair<String, String>>();
+		ret = new LinkedList<VariableDecl>();
 		this.debug = new Debug();
 	}
 
@@ -40,8 +40,15 @@ public class LocalVariableExtractor extends CBaseListener {
 			return;
 		}
 		String declarator = initDeclaratorList.initDeclarator().declarator().getText();
-		debug.println("\tLocalVariableExtractor found declarator `" + declarator + "`");
-		ret.add(new Pair<String, String>(declarationSpecifier, declarator));
+		String initializer = "";
+		if(initDeclaratorList.initDeclarator().initializer() != null) {
+			initializer = initDeclaratorList.initDeclarator().initializer().getText();
+		}
+		
+		VariableDecl var = new VariableDecl(declarationSpecifier, declarator, initializer);
+		ret.add(var);
+		debug.println("\tLocalVariableExtractor found declaration " + var.toString());
+
 		extractDeclarators(declarationSpecifier, initDeclaratorList.initDeclaratorList());
 	}
 

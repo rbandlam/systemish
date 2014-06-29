@@ -10,7 +10,9 @@ int process_pkts_in_batch(int *pkt_lo)
 		
 		static volatile int **ptrs[5];
 		
-		unsigned int a_1 = hash(pkt_lo[batch_index]) & LOG_CAP_;
+		for(a1 = 0; a1 < 4; a1 ++) {
+			unsigned int a_1 = hash(pkt_lo[batch_index]) & LOG_CAP_;
+		}
 		
 		int a_2 = hash(a_1) & LOG_CAP_;
 		sum += ht_log[a_20];

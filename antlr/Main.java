@@ -52,8 +52,8 @@ public class Main {
 		LocalVariableExtractor extractor = new LocalVariableExtractor(parser);
 		walker.walk(extractor, tree);
 		
-		for(Pair<String, String> localVar : extractor.ret) {
-			System.out.println(localVar.toString());
+		for(VariableDecl var : extractor.ret) {
+			System.out.println(var.toString());
 		}
 		return "";
 	}
