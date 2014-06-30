@@ -17,8 +17,6 @@ public class LocalVariableVectorizer extends CBaseListener {
 		this.rewriter = rewriter;
 		this.debug = new Debug();
 		this.localVariables = localVariables;
-		
-		
 	}
 	
 	@Override
@@ -26,7 +24,8 @@ public class LocalVariableVectorizer extends CBaseListener {
 		String primaryExpression = debug.btrText(ctx, tokens);
 		VariableDecl vd = new VariableDecl("", primaryExpression, "");
 		if(localVariables.contains(vd)) {
-			debug.println(primaryExpression + " is a local variable" );
+			debug.println(primaryExpression + " is a local variable. Vectorizing.");
+			rewriter.replace(ctx.start, primaryExpression + "[I]");
 		}
 	}
 	
