@@ -1,21 +1,25 @@
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 
-public class LocalVariableReplacer extends CBaseListener {
+public class DeclarationTrimmer extends CBaseListener {
 	CParser parser;
 	TokenStream tokens;
 	TokenStreamRewriter rewriter;
 	Debug debug;
 	
-	public LocalVariableReplacer(CParser parser, TokenStreamRewriter rewriter) {
+	public DeclarationTrimmer(CParser parser, TokenStreamRewriter rewriter) {
 		this.parser = parser;
 		tokens = parser.getTokenStream();
 		this.rewriter = rewriter;
 		this.debug = new Debug();
 	}
 
-	 // declaration ~ declarationSpecifiers initDeclaratorList? ';'
-	 // initDeclarator ~ declarator | declarator '=' initializer
+	
+	// Deletes all declarationSpecifiers. Deletes initDeclarators that
+	// don't have an initializer.
+	// **
+	// declaration ~ declarationSpecifiers initDeclaratorList? ';'
+	// initDeclarator ~ declarator | declarator '=' initializer
 	@Override
 	public void enterDeclaration(CParser.DeclarationContext ctx) {
 		

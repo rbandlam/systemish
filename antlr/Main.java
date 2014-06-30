@@ -17,7 +17,7 @@ public class Main {
 		String code = getCode(gotoFilePath);
 	
 		LinkedList<VariableDecl> localVars = extractLocalVariables(code);
-		code = replaceLocalVariables(code);
+		code = trimDeclarations(code);
 
 		code = cleanup(code);
 		
@@ -26,7 +26,7 @@ public class Main {
 	
 	
 	private static String cleanup(String code) {
-		System.out.println("Running cleanup");
+		System.out.println("\n\nRunning cleanup");
 		
 		CharStream charStream = new ANTLRInputStream(code);
 		CLexer lexer = new CLexer(charStream);
@@ -46,8 +46,8 @@ public class Main {
 
 	}
 
-	private static String replaceLocalVariables(String code) {
-		System.out.println("Replacing local variables");
+	private static String trimDeclarations(String code) {
+		System.out.println("\n\nTrimming declarations");
 
 		CharStream charStream = new ANTLRInputStream(code);		
 		CLexer lexer = new CLexer(charStream);
@@ -58,16 +58,16 @@ public class Main {
 		// Parse and get the root of the parse tree
 		ParserRuleContext tree = parser.compilationUnit();
 
-		LocalVariableReplacer replacer = new LocalVariableReplacer(parser, rewriter);
+		DeclarationTrimmer dCleaner = new DeclarationTrimmer(parser, rewriter);
 		
 		ParseTreeWalker walker = new ParseTreeWalker();
-		walker.walk(replacer, tree);
+		walker.walk(dCleaner, tree);
 		
 		return rewriter.getText();
 	}
 
 	private static LinkedList<VariableDecl> extractLocalVariables(String code) {
-		System.out.println("Extracting local variables");
+		System.out.println("\n\nExtracting local variables");
 		
 		CharStream charStream = new ANTLRInputStream(code);
 		CLexer lexer = new CLexer(charStream);
@@ -81,8 +81,9 @@ public class Main {
 		LocalVariableExtractor extractor = new LocalVariableExtractor(parser);
 		walker.walk(extractor, tree);
 		
+		System.out.println("Discovered local variables:");
 		for(VariableDecl var : extractor.ret) {
-			System.out.println(var.type + " " + var.name + "[BATCH_SIZE];");
+			System.out.println(var.type + ", " + var.name + " " + var.value);
 		}
 		return extractor.ret;
 	}
