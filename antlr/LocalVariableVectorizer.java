@@ -19,6 +19,8 @@ public class LocalVariableVectorizer extends CBaseListener {
 		this.localVariables = localVariables;
 	}
 	
+	// primaryExpression is a variable, a constant, or an expression in braces.
+	// In a->b and a.b, b is not a primary expression, but a is.
 	@Override
 	public void enterPrimaryExpression(CParser.PrimaryExpressionContext ctx) {
 		String primaryExpression = debug.btrText(ctx, tokens);
