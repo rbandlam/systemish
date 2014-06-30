@@ -50,4 +50,13 @@ class VariableDecl {
 			return type + " " + name + " = " + value;
 		}
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		VariableDecl ov = (VariableDecl) o;
+		if(this.name.contentEquals(ov.name)) {
+			return true;
+		}
+		return false;
+	}
 }

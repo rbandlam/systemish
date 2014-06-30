@@ -24,7 +24,7 @@ public class LocalVariableExtractor extends CBaseListener {
 		debug.println("LocalVariableExtractor found declarationSpecifier: `" + 
 				declarationSpecifier + "`" );
 		
-		// The identifiers declared	
+		// The identifiers declared	with this declarationSpecifier
 		extractDeclarators(declarationSpecifier, ctx.initDeclaratorList()); 
 	}
 

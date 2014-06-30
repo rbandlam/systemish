@@ -11,20 +11,42 @@ import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Main {
-	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/test.c";
+	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/cuckoo2.c";
 	
 	public static void main(String args[]) throws FileNotFoundException {
 		String code = getCode(gotoFilePath);
 	
 		LinkedList<VariableDecl> localVars = extractLocalVariables(code);
 		code = trimDeclarations(code);
-
 		code = cleanup(code);
+		code = vectorizeLocalVariables(code, localVars);
 		
 		System.out.println(code);
 	}
 	
-	
+	private static String vectorizeLocalVariables(String code, 
+			LinkedList<VariableDecl> localVars) {
+		System.out.println("\n\nVectorizing local variables");
+
+		CharStream charStream = new ANTLRInputStream(code);		
+		CLexer lexer = new CLexer(charStream);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+		CParser parser = new CParser(tokens);
+		
+		// Parse and get the root of the parse tree
+		ParserRuleContext tree = parser.compilationUnit();
+
+		LocalVariableVectorizer lvVectorizer = new LocalVariableVectorizer(parser, 
+				rewriter, localVars);
+		
+		ParseTreeWalker walker = new ParseTreeWalker();
+		walker.walk(lvVectorizer, tree);
+		
+		return rewriter.getText();
+	}
+
+
 	private static String cleanup(String code) {
 		System.out.println("\n\nRunning cleanup");
 		
@@ -83,7 +105,7 @@ public class Main {
 		
 		System.out.println("Discovered local variables:");
 		for(VariableDecl var : extractor.ret) {
-			System.out.println(var.type + ", " + var.name + " " + var.value);
+			System.out.println(var.type + ", " + var.name + ", " + var.value);
 		}
 		return extractor.ret;
 	}
