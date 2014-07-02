@@ -1,20 +1,30 @@
 // Process BATCH_SIZE pkts starting from lo
 int process_pkts_in_batch(int *pkt_lo)
 {
-	// Like a foreach loop
-	for(batch_index = 0; batch_index < BATCH_SIZE; batch_index ++) {
+    // Like a foreach loop
+    foreach(batch_index, BATCH_SIZE) {                       
+        int i;                                    
+        int jumper = pkt_lo[batch_index];         
+                                                  
+        for(i = 0; i < DEPTH; i++) {              
+            int *arr = cache[jumper].slot_arr;    
+            int j, best_j = 0;                    
+                                                  
+            int max_diff = ABS(arr[0] - jumper) % 8;
 
-		volatile struct rte_mbuf *a;
-		int a1 = 1, a2 = 1, a3 = 1;
-		a1 = 5;
-		
-		static volatile int **ptrs[5];
-		
-		for(a1 = 0; a1 < 4; a1 ++) {
-			unsigned int a_1 = hash(pkt_lo[batch_index]) & LOG_CAP_;
-		}
-		
-		int a_2 = hash(a_1) & LOG_CAP_;
-		sum += ht_log[a_20];
-    }   
+            for(j = 1; j < SLOTS_PER_BKT; j ++) {
+                if(ABS(arr[j] - jumper) % 8 > max_diff) {
+                    max_diff = ABS(arr[j] - jumper) % 8;
+                    best_j = j;
+                }   
+            }   
+    
+            jumper = arr[best_j];
+            if(jumper % 16 == 0) {      // GCC will optimize this
+                break;
+            }
+        }
+
+        sum += jumper;
+    }
 }
