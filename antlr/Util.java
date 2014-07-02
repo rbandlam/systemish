@@ -54,7 +54,14 @@ class VariableDecl {
 	@Override
 	public boolean equals(Object o) {
 		VariableDecl ov = (VariableDecl) o;
-		if(this.name.contentEquals(ov.name)) {
+		
+		// We store local variable names along with the *s. For example, 
+		// int **baz = 1; is stored as (int, **baz, 1). When searching for 
+		// Object x in a list, x.equals(o) is called for each o in the list.
+		
+		String ovRealName = ov.name.replaceAll("[*]+", "");
+		// System.err.println("\tComparing " + this.name + " with localVar " + ovRealName);
+		if(ovRealName.contentEquals(this.name)) {
 			return true;
 		}
 		return false;

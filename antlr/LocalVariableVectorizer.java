@@ -24,6 +24,7 @@ public class LocalVariableVectorizer extends CBaseListener {
 	@Override
 	public void enterPrimaryExpression(CParser.PrimaryExpressionContext ctx) {
 		String primaryExpression = debug.btrText(ctx, tokens);
+		// debug.println("Primary Expression: " + primaryExpression);
 		VariableDecl vd = new VariableDecl("", primaryExpression, "");
 		if(localVariables.contains(vd)) {
 			debug.println(primaryExpression + " is a local variable. Vectorizing.");
