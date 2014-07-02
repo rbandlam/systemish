@@ -6,8 +6,8 @@ static int _cuckoopath_search(cuckoo_hashtable_t *h,
     
     while ((h->kick_count < MAX_CUCKOO_COUNT) && (depth >= 0) && (depth < MAX_CUCKOO_COUNT - 1))
     {
-        cuckoo_record_t *curr = h->cuckoo_path + depth;
-        cuckoo_record_t *next = h->cuckoo_path + depth + 1;
+        cuckoo_record_t **curr = h->cuckoo_path + depth;
+        cuckoo_record_t **next = h->cuckoo_path + depth + 1;
         
         size_t idx;
         for (idx = 0; idx < NUM_CUCKOO_PATH; idx++)

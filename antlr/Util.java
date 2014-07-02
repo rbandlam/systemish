@@ -45,10 +45,14 @@ class VariableDecl {
 	
 	public String toString() {
 		if(value.contentEquals("")) {
-			return type + " " + name + " = " + "??";
+			return type + " " + name + ";";
 		} else {
-			return type + " " + name + " = " + value;
+			return type + " " + name + " = " + value + ";";
 		}
+	}
+	
+	public String arrayDecl() {
+		return type + " " + name + "[BATCH_SIZE]" + ";";
 	}
 	
 	@Override

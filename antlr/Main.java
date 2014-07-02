@@ -20,6 +20,9 @@ public class Main {
 		code = trimDeclarations(code);
 		code = cleanup(code);
 		code = vectorizeLocalVariables(code, localVars);
+	
+		// This should be done after vectorizing local variable usage
+		code = insertLocalVariableDeclarations(code, localVars);
 		
 		System.out.flush();
 		System.err.println("\nFinal code:");
@@ -27,6 +30,29 @@ public class Main {
 		System.out.println(code);
 	}
 	
+	private static String insertLocalVariableDeclarations(String code,
+			LinkedList<VariableDecl> localVars) {
+		System.out.println("\n\nInserting local variable declarations");
+
+		CharStream charStream = new ANTLRInputStream(code);		
+		CLexer lexer = new CLexer(charStream);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+		CParser parser = new CParser(tokens);
+		
+		// Parse and get the root of the parse tree
+		ParserRuleContext tree = parser.compilationUnit();
+
+		DeclarationInserter dInserter = new DeclarationInserter(parser, 
+				rewriter, localVars);
+		
+		ParseTreeWalker walker = new ParseTreeWalker();
+		walker.walk(dInserter, tree);
+		
+		System.err.println();  // We print the replaced local vars on a single line
+		return rewriter.getText();
+	}
+
 	private static String vectorizeLocalVariables(String code, 
 			LinkedList<VariableDecl> localVars) {
 		System.out.println("\n\nVectorizing local variables");

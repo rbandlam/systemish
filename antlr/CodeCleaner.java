@@ -6,6 +6,7 @@ public class CodeCleaner extends CBaseListener {
 	TokenStream tokens;
 	TokenStreamRewriter rewriter;
 	Debug debug;
+	int numEntries = 0;
 	
 	public CodeCleaner(CParser parser, TokenStreamRewriter rewriter) {
 		this.parser = parser;
@@ -14,12 +15,18 @@ public class CodeCleaner extends CBaseListener {
 		this.debug = new Debug();
 	}
 
-	// As TokenStreamRewrites only works inside Listeners, we put the code
+	// As TokenStreamRewriter only works inside Listeners, we put the code
 	// for code cleanup here. For this to work, either there should be only
 	// one function definition in the input code, or the cleanup should be
 	// idempotent.
 	@Override
 	public void enterFunctionDefinition(CParser.FunctionDefinitionContext ctx) {
+		if(numEntries != 0) {
+			System.err.println("ERROR: CodeCleaner entered twice. Aborting.");
+			System.exit(-1);
+		}
+		numEntries ++;
+		
 		debug.println("Running cleanup from function definition: `" + 
 				debug.btrText(ctx.declarator(), tokens));
 		int numTokens = tokens.size();
