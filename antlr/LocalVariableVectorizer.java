@@ -9,6 +9,7 @@ public class LocalVariableVectorizer extends CBaseListener {
 	TokenStreamRewriter rewriter;
 	Debug debug;
 	LinkedList<VariableDecl> localVariables;
+	int numPrinted = 0;
 	
 	public LocalVariableVectorizer(CParser parser, 
 			TokenStreamRewriter rewriter, LinkedList<VariableDecl> localVariables) {
@@ -17,6 +18,7 @@ public class LocalVariableVectorizer extends CBaseListener {
 		this.rewriter = rewriter;
 		this.debug = new Debug();
 		this.localVariables = localVariables;
+		this.numPrinted = 0;
 	}
 	
 	// primaryExpression is a variable, a constant, or an expression in braces.
@@ -27,7 +29,14 @@ public class LocalVariableVectorizer extends CBaseListener {
 		// debug.println("Primary Expression: " + primaryExpression);
 		VariableDecl vd = new VariableDecl("", primaryExpression, "");
 		if(localVariables.contains(vd)) {
-			debug.println(primaryExpression + " is a local variable. Vectorizing.");
+			// Pretty printing: print 10 replaced local-vars per line
+			if(numPrinted % 10 == 9) {
+				debug.print(primaryExpression + "\n");
+			} else {
+				debug.print(primaryExpression + ", ");
+			}
+			
+			numPrinted ++;
 			rewriter.replace(ctx.start, primaryExpression + "[I]");
 		}
 	}

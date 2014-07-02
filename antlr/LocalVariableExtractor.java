@@ -36,13 +36,13 @@ public class LocalVariableExtractor extends CBaseListener {
 		if(initDeclaratorList == null) {
 			return;
 		}
-		String declarator = initDeclaratorList.initDeclarator().declarator().getText();
-		String initializer = "";
+		String name = initDeclaratorList.initDeclarator().declarator().getText();
+		String value = "";
 		if(initDeclaratorList.initDeclarator().initializer() != null) {
-			initializer = initDeclaratorList.initDeclarator().initializer().getText();
+			value = initDeclaratorList.initDeclarator().initializer().getText();
 		}
 		
-		VariableDecl var = new VariableDecl(declarationSpecifier, declarator, initializer);
+		VariableDecl var = new VariableDecl(declarationSpecifier, name, value);
 		ret.addLast(var);
 		debug.println("\tLocalVariableExtractor found declaration: " + var.toString());
 

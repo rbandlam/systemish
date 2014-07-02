@@ -11,7 +11,7 @@ import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Main {
-	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/cuckoo2.c";
+	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/cuckoo.c";
 	
 	public static void main(String args[]) throws FileNotFoundException {
 		String code = getCode(gotoFilePath);
@@ -21,6 +21,9 @@ public class Main {
 		code = cleanup(code);
 		code = vectorizeLocalVariables(code, localVars);
 		
+		System.out.flush();
+		System.err.println("\nFinal code:");
+		System.err.flush();
 		System.out.println(code);
 	}
 	
@@ -43,6 +46,7 @@ public class Main {
 		ParseTreeWalker walker = new ParseTreeWalker();
 		walker.walk(lvVectorizer, tree);
 		
+		System.err.println();  // We print the replaced local vars on a single line
 		return rewriter.getText();
 	}
 
