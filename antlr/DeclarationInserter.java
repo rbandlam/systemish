@@ -33,22 +33,36 @@ public class DeclarationInserter extends CBaseListener {
 		}
 		numEntries ++;
 		
-		String boilerPlate = 	"\tint I = 0;          // batch index\n" + 
-								"\tvoid *batch_rips[BATCH_SIZE];       // goto targets\n" +
-								"\tint iMask = 0;      // No packet is done yet";
+		// State maintainance code at the beginning 
+		String initCode = 	"\tint I = 0;          // batch index\n" + 
+							"\tvoid *batch_rips[BATCH_SIZE];       // goto targets\n" +
+							"\tint iMask = 0;      // No packet is done yet";
 
+		// Declare all local variables
 		String lvDeclarations = "";
 		for(VariableDecl vdecl : localVariables) {
 			lvDeclarations = lvDeclarations + "\t" + vdecl.arrayDecl() + "\n";
 		}
+		
+		// State maintainance code at the end
+		String endCode = 	"end:\n" +
+							"\tbatch_rips[I] = &&end;\n" +
+							"\tiMask = SET(iMask, I);\n" + 
+							"\tif(iMask == (1 << BATCH_SIZE) - 1) {\n"+
+							"\t\treturn;\n" +
+	    					"\t}\n"+   
+	    					"\tI = (I + 1) & BATCH_SIZE_;\n"+
+	    					"\tgoto *batch_rips[I];\n";
 		
 		debug.println("Inserting local var declarations from function definition: `" + 
 				debug.btrText(ctx.declarator(), tokens));
 		CParser.CompoundStatementContext csx = ctx.compoundStatement();
 		
 		// The first token of the compoundStatement is '{'
-		rewriter.insertAfter(csx.start, "\n" + boilerPlate + "\n\n" + lvDeclarations);
+		rewriter.insertAfter(csx.start, "\n" + initCode + "\n\n" + lvDeclarations);
 		
+		// The last statement of the compoundStatement is '}'
+		rewriter.insertBefore(csx.stop, "\n" + endCode + "\n");
 	}
 	
 }
