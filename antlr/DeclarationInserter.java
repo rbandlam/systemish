@@ -33,7 +33,11 @@ public class DeclarationInserter extends CBaseListener {
 		}
 		numEntries ++;
 		
-		String lvDeclarations = "\n";
+		String boilerPlate = 	"\tint I = 0;          // batch index\n" + 
+								"\tvoid *batch_rips[BATCH_SIZE];       // goto targets\n" +
+								"\tint iMask = 0;      // No packet is done yet";
+
+		String lvDeclarations = "";
 		for(VariableDecl vdecl : localVariables) {
 			lvDeclarations = lvDeclarations + "\t" + vdecl.arrayDecl() + "\n";
 		}
@@ -43,7 +47,7 @@ public class DeclarationInserter extends CBaseListener {
 		CParser.CompoundStatementContext csx = ctx.compoundStatement();
 		
 		// The first token of the compoundStatement is '{'
-		rewriter.insertAfter(csx.start, lvDeclarations);
+		rewriter.insertAfter(csx.start, "\n" + boilerPlate + "\n\n" + lvDeclarations);
 		
 	}
 	
