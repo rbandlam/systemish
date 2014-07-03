@@ -490,7 +490,7 @@ iterationStatement
     |   'do' statement 'while' '(' expression ')' ';'
     |   'for' '(' expression? ';' expression? ';' expression? ')' statement
     |	'for' '(' declaration expression? ';' expression? ')' statement
-    |   'foreach' '(' Identifier ',' Identifier ')' statement
+    |   'foreach' '(' Identifier ',' Identifier ')' compoundStatement
     ;
 
 jumpStatement

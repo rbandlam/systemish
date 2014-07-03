@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -11,7 +12,7 @@ import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class Main {
-	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/src/goto.c";
+	static String gotoFilePath = "/Users/akalia/Documents/workspace/fastpp/test/nogoto.c";
 	
 	public static void main(String args[]) throws FileNotFoundException {
 		String code = getCode(gotoFilePath);
@@ -23,13 +24,39 @@ public class Main {
 	
 		// This should be done after vectorizing local variable usage
 		code = insertLocalVariableDeclarations(code, localVars);
+		code = deleteForeach(code, localVars);
 		
 		System.out.flush();
 		System.err.println("\nFinal code:");
 		System.err.flush();
 		System.out.println(code);
+		
+		PrintWriter out = new PrintWriter(new File(gotoFilePath + ".proc"));
+		out.println(code);
+		out.close();
 	}
 	
+	private static String deleteForeach(String code,
+			LinkedList<VariableDecl> localVars) {
+		System.out.println("\n\n Deleting foreach");
+
+		CharStream charStream = new ANTLRInputStream(code);		
+		CLexer lexer = new CLexer(charStream);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+		CParser parser = new CParser(tokens);
+		
+		// Parse and get the root of the parse tree
+		ParserRuleContext tree = parser.compilationUnit();
+
+		ForeachDeleter feDeleter = new ForeachDeleter(parser, rewriter);
+		
+		ParseTreeWalker walker = new ParseTreeWalker();
+		walker.walk(feDeleter, tree);
+		
+		return rewriter.getText();
+	}
+
 	private static String insertLocalVariableDeclarations(String code,
 			LinkedList<VariableDecl> localVars) {
 		System.out.println("\n\nInserting local variable declarations");

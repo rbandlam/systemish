@@ -22,7 +22,7 @@ public class DeclarationInserter extends CBaseListener {
 	}
 	
 	// As TokenStreamRewriter only works inside Listeners, we put the code
-	// for code cleanup here. For this to work, either there should be only
+	// for inserting lv declarations here. For this to work, either there should be only
 	// one function definition in the input code, or the cleanup should be
 	// idempotent.
 	@Override
