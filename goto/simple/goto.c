@@ -58,14 +58,14 @@ int process_pkts_in_batch(int *pkt_lo)
 
 label_0:
 
-    // Like a foreach loop
-    
-        mem_addr[I] = hash(pkt_lo[I]) & LOG_CAP_;
+	// Like a foreach loop
+	
+		mem_addr[I] = hash(pkt_lo[I]) & LOG_CAP_;
 		FPP_PSS(&ht_log[mem_addr[I]], label_1);
 label_1:
 
-        sum += ht_log[mem_addr[I]];
-    
+		sum += ht_log[mem_addr[I]];
+	
 end:
     batch_rips[I] = &&end;
     iMask = FPP_SET(iMask, I); 
