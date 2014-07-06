@@ -8,11 +8,7 @@
 #include "param.h"
 
 #define foreach(i, n) for(i = 0; i < n; i ++)
-<<<<<<< HEAD
-#define PREFETCH(x) {}		// Just a hint
-=======
 #define PREFETCH(x) {}
->>>>>>> eb9f5cc7466c7f63f8ae081c0bd9551aaa755768
 
 int sum = 0;
 
@@ -36,7 +32,7 @@ int hash(int a)
 	int ret = a;
 	int i;
 	for(i = 0; i < COMPUTE; i++) {
-		ret = ret + ((i * ret) % 5);
+		ret = ret + ((i * ret) % 8);
 	}
 
 	return ret;
@@ -52,11 +48,7 @@ int process_pkts_in_batch(int *pkt_lo)
 	foreach(batch_index, BATCH_SIZE) {
 
 		int mem_addr = hash(pkt_lo[batch_index]) & LOG_CAP_;
-<<<<<<< HEAD
 		PREFETCH(&ht_log[mem_addr]);
-=======
-		PREFETCH(mem_addr);
->>>>>>> eb9f5cc7466c7f63f8ae081c0bd9551aaa755768
 		sum += ht_log[mem_addr];
 	}
 }

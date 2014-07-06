@@ -32,7 +32,7 @@ int hash(int a)
 	int ret = a;
 	int i;
 	for(i = 0; i < COMPUTE; i++) {
-		ret = ret + ((i * ret) % 5);
+		ret = ret + ((i * ret) % 8);
 	}
 
 	return ret;
