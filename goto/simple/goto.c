@@ -7,8 +7,8 @@
 
 #include "param.h"
 
-// Each packet contains a random integer. The memory address accessed
-// by the packet is determined by an expensive hash of the integer.
+#define foreach(i, n) for(i = 0; i < n; i ++)
+#define PREFETCH(x)		// Just a hint
 
 int sum = 0;
 
@@ -17,14 +17,13 @@ int *ht_log;
 #define LOG_CAP_ ((128 * 1024 * 1024) - 1)
 #define LOG_SID 1
 
+// Each packet contains a random integer. The memory address accessed
+// by the packet is determined by an expensive hash of the integer.
 int *pkts;
 #define NUM_PKTS (16 * 1024 * 1024)
 
 #define BATCH_SIZE 8
 #define BATCH_SIZE_ 7
-
-int batch_index = 0;
-int mem_addr[BATCH_SIZE];
 
 // Some compute function
 // Increment 'a' by at most COMPUTE * 4: the return value is still random
@@ -39,29 +38,43 @@ int hash(int a)
 	return ret;
 }
 
+// batch_index must be declared outside process_pkts_in_batch
+int batch_index = 0;
+
 // Process BATCH_SIZE pkts starting from lo
+#include "fpp.h"
 int process_pkts_in_batch(int *pkt_lo)
 {
-	batch_index = 0;
+	int mem_addr[BATCH_SIZE];
 
-label1:
-	// Compute	
-	mem_addr[batch_index] = hash(pkt_lo[batch_index]) & LOG_CAP_;
-	__builtin_prefetch(&ht_log[mem_addr[batch_index]], 0, 0);
+	int I = 0;			// batch index
+	void *batch_rips[BATCH_SIZE];		// goto targets
+	int iMask = 0;		// No packet is done yet
 
-	batch_index = (batch_index + 1) & BATCH_SIZE_;
-	if(batch_index != 0) {
-		goto label1;
+	int temp_index;
+	for(temp_index = 0; temp_index < BATCH_SIZE; temp_index ++) {
+		batch_rips[temp_index] = &&label_0;
 	}
 
-label2:
-	// Memory access
-	sum += ht_log[mem_addr[batch_index]];
+label_0:
 
-	batch_index = (batch_index + 1) & BATCH_SIZE_;
-	if(batch_index != 0) {
-		goto label2;
-	}
+    // Like a foreach loop
+    
+        mem_addr[I] = hash(pkt_lo[I]) & LOG_CAP_;
+		FPP_PSS(&ht_log[mem_addr[I]], label_1);
+label_1:
+
+        sum += ht_log[mem_addr[I]];
+    
+end:
+    batch_rips[I] = &&end;
+    iMask = FPP_SET(iMask, I); 
+    if(iMask == (1 << BATCH_SIZE) - 1) {
+        return;
+    }
+    I = (I + 1) & BATCH_SIZE_;
+    goto *batch_rips[I];
+
 }
 
 int main(int argc, char **argv)
