@@ -1,11 +1,11 @@
 #include "common.h"
 
 __global__ void
-vectorAdd(const float *A, const float *B, float *C, int numElements)
+vectorAdd(const float *A, const float *B, float *C, int N)
 {
     int i = blockDim.x * blockIdx.x + threadIdx.x;
 
-    if (i < numElements)
+    if (i < N)
     {
         C[i] = A[i] + B[i];
     }
@@ -20,18 +20,13 @@ main(void)
     cudaError_t err = cudaSuccess;
 
     // Print the vector length to be used, and compute its size
-    int numElements = 50000;
-    size_t size = numElements * sizeof(float);
-    printf("[Vector addition of %d elements]\n", numElements);
+    int N = 50000;
+    printf("[Vector addition of %d elements]\n", N);
 
-    // Allocate the host input vector A
-    float *h_A = (float *)malloc(size);
-
-    // Allocate the host input vector B
-    float *h_B = (float *)malloc(size);
-
-    // Allocate the host output vector C
-    float *h_C = (float *)malloc(size);
+	// Allocate host vectors
+    float *h_A = (float *) malloc(N * sizeof(float));
+    float *h_B = (float *) malloc(N * sizeof(float));
+    float *h_C = (float *) malloc(N * sizeof(float));
 
     // Verify that allocations succeeded
     if (h_A == NULL || h_B == NULL || h_C == NULL)
@@ -41,7 +36,7 @@ main(void)
     }
 
     // Initialize the host input vectors
-    for (int i = 0; i < numElements; ++i)
+    for (int i = 0; i < N; ++i)
     {
         h_A[i] = rand()/(float)RAND_MAX;
         h_B[i] = rand()/(float)RAND_MAX;
@@ -49,7 +44,7 @@ main(void)
 
     // Allocate the device input vector A
     float *d_A = NULL;
-    err = cudaMalloc((void **)&d_A, size);
+    err = cudaMalloc((void **)&d_A, N * sizeof(float));
 
     if (err != cudaSuccess)
     {
@@ -59,7 +54,7 @@ main(void)
 
     // Allocate the device input vector B
     float *d_B = NULL;
-    err = cudaMalloc((void **)&d_B, size);
+    err = cudaMalloc((void **)&d_B, N * sizeof(float));
 
     if (err != cudaSuccess)
     {
@@ -69,7 +64,7 @@ main(void)
 
     // Allocate the device output vector C
     float *d_C = NULL;
-    err = cudaMalloc((void **)&d_C, size);
+    err = cudaMalloc((void **)&d_C, N * sizeof(float));
 
     if (err != cudaSuccess)
     {
@@ -80,7 +75,7 @@ main(void)
     // Copy the host input vectors A and B in host memory to the device input vectors in
     // device memory
     printf("Copy input data from the host memory to the CUDA device\n");
-    err = cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice);
+    err = cudaMemcpy(d_A, h_A, N * sizeof(float), cudaMemcpyHostToDevice);
 
     if (err != cudaSuccess)
     {
@@ -88,7 +83,7 @@ main(void)
         exit(EXIT_FAILURE);
     }
 
-    err = cudaMemcpy(d_B, h_B, size, cudaMemcpyHostToDevice);
+    err = cudaMemcpy(d_B, h_B, N * sizeof(float), cudaMemcpyHostToDevice);
 
     if (err != cudaSuccess)
     {
@@ -98,9 +93,9 @@ main(void)
 
     // Launch the Vector Add CUDA Kernel
     int threadsPerBlock = 256;
-    int blocksPerGrid =(numElements + threadsPerBlock - 1) / threadsPerBlock;
+    int blocksPerGrid =(N + threadsPerBlock - 1) / threadsPerBlock;
     printf("CUDA kernel launch with %d blocks of %d threads\n", blocksPerGrid, threadsPerBlock);
-    vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, numElements);
+    vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, N);
     err = cudaGetLastError();
 
     if (err != cudaSuccess)
@@ -112,7 +107,7 @@ main(void)
     // Copy the device result vector in device memory to the host result vector
     // in host memory.
     printf("Copy output data from the CUDA device to the host memory\n");
-    err = cudaMemcpy(h_C, d_C, size, cudaMemcpyDeviceToHost);
+    err = cudaMemcpy(h_C, d_C, N * sizeof(float), cudaMemcpyDeviceToHost);
 
     if (err != cudaSuccess)
     {
@@ -121,7 +116,7 @@ main(void)
     }
 
     // Verify that the result vector is correct
-    for (int i = 0; i < numElements; ++i)
+    for (int i = 0; i < N; ++i)
     {
         if (fabs(h_A[i] + h_B[i] - h_C[i]) > 1e-5)
         {
