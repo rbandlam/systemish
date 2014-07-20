@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <cuda_runtime.h>
+#include "common.h"
 
 __global__ void
 vectorAdd(const float *A, const float *B, float *C, int numElements)
@@ -15,6 +16,11 @@ vectorAdd(const float *A, const float *B, float *C, int numElements)
 int
 main(void)
 {
+	struct cudaDeviceProp deviceProp;
+	int ret = cudaGetDeviceProperties(&deviceProp, 0);
+	CPE(ret != cudaSuccess, "Get Device Properties failed\n", -1);
+	printf("Device name: %s\n", deviceProp.name);
+
     // Error code to check return values for CUDA calls
     cudaError_t err = cudaSuccess;
 
