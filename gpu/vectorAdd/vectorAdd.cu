@@ -14,6 +14,8 @@ vectorAdd(const float *A, const float *B, float *C, int N)
 int main(void)
 {
 	int err, N = 500000;
+	struct timespec start, end;
+
 	printDeviceProperties();
 
 	printf("[Vector addition of %d elements]\n", N);
@@ -32,8 +34,11 @@ int main(void)
 	// Initialize the host input vectors
 	for (int i = 0; i < N; ++i)	{
 		h_A[i] = rand() / (float) RAND_MAX;
-		h_B[i] = rand() / (float)RAND_MAX;
+		h_B[i] = rand() / (float) RAND_MAX;
 	}
+
+	// Start the clock
+	clock_gettime(CLOCK_REALTIME, &start);
 
 	// Allocate the device input vector A
 	float *d_A = NULL, *d_B = NULL, *d_C = NULL;
@@ -61,17 +66,20 @@ int main(void)
 	int blocksPerGrid = (N + threadsPerBlock - 1) / threadsPerBlock;
 	printf("CUDA kernel launch with %d blocks of %d threads\n", blocksPerGrid, threadsPerBlock);
 
-
 	vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, N);
+	clock_gettime(CLOCK_REALTIME, &end);
 
 	err = cudaGetLastError();
 	CPE(err != cudaSuccess, "Failed to launch vectorAdd kernel\n", -1);
 
-	// Copy the device result vector in device memory to the host result vector
-	// in host memory.
+	// Copy back the result
 	printf("Copy output data from the CUDA device to the host memory\n");
 	err = cudaMemcpy(h_C, d_C, N * sizeof(float), cudaMemcpyDeviceToHost);
 	CPE(err != cudaSuccess, "Failed to copy C from device to host\n", -1);
+
+	double time = (double) (end.tv_nsec - start.tv_nsec) / 1000000000 + 
+		(end.tv_sec - start.tv_sec);
+	printf("Time = %f\n", time);
 
 	// Verify that the result vector is correct
 	for (int i = 0; i < N; ++i) {
@@ -80,6 +88,7 @@ int main(void)
 			exit(EXIT_FAILURE);
 		}
 	}
+
 	printf("Test PASSED\n");
 
 	// Free device global memory
