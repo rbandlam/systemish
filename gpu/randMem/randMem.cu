@@ -6,7 +6,10 @@ vectorAdd(int *pkts, const int *log)
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 
 	if (i < NUM_PKTS) {
-		pkts[i] = log[pkts[i]];
+		int j;
+		for(j = 0; j < DEPTH; j ++) {
+			pkts[i] = log[pkts[i]];
+		}
 	}
 }
 
@@ -17,7 +20,10 @@ void cpu_run(int *pkts, int *log)
 	clock_gettime(CLOCK_REALTIME, &start);
 
 	for(i = 0; i < NUM_PKTS; i ++) {
-		pkts[i] = log[pkts[i]];
+		int j;
+		for(j = 0; j < DEPTH; j ++) {
+			pkts[i] = log[pkts[i]];
+		}
 	}
 
 	clock_gettime(CLOCK_REALTIME, &end);
@@ -88,13 +94,13 @@ int main(void)
 	
 	// Initialize packets
 	for(i = 0; i < NUM_PKTS; i ++) {
-		h_pkts_cpu[i] = rand() % (LOG_CAP - 1);
+		h_pkts_cpu[i] = rand() % LOG_CAP;
 		h_pkts_gpu[i] = h_pkts_cpu[i];
 	}
 
 	// Initialize log
 	for(i = 0; i < LOG_CAP; i ++) {
-		h_log[i] = rand();
+		h_log[i] = rand() % LOG_CAP;
 	}
 
 	cpu_run(h_pkts_cpu, h_log);
