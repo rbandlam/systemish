@@ -2,6 +2,8 @@
 #include <cuda_runtime.h>
 #include <time.h>
 
+#define COMPUTE 100
+
 void printDeviceProperties();
 
 #define CPE(val, msg, err_code) \
