@@ -13,3 +13,9 @@ xia-router2: .042 s => 761.92 M random accesses per second
 * Memory controllers:
 	xia-router2: GTX 570 Ti: 2 64-bit memory controllers
 	susitna: Tesla K20C: 6 64-bit memory controllers
+
+
+* Questions:
+	Does better gencode (arch/code pairs) help? Doesn't seem to..
+	GTX-750 has compute 5.0, but nvcc-5.5 supports only up to 3.5.
+
