@@ -6,13 +6,16 @@ void printDeviceProperties()
 	int ret = cudaGetDeviceProperties(&deviceProp, 0);
 	CPE(ret != cudaSuccess, "Get Device Properties failed\n", -1);
 
-	printf("Device name: %s\n", deviceProp.name);
-	printf("Total global memory: %lu bytes\n", deviceProp.totalGlobalMem);
-	printf("Warp size: %d\n", deviceProp.warpSize);
-	printf("Compute capability: %d.%d\n", deviceProp.major, deviceProp.minor);
+	printf("\n=================DEVICE PROPERTIES=================\n");
+	printf("\tDevice name: %s\n", deviceProp.name);
+	printf("\tTotal global memory: %lu bytes\n", deviceProp.totalGlobalMem);
+	printf("\tWarp size: %d\n", deviceProp.warpSize);
+	printf("\tCompute capability: %d.%d\n", deviceProp.major, deviceProp.minor);
 
-	printf("Multi-processor count: %d\n", deviceProp.multiProcessorCount);
-	printf("Threads per multi-processor: %d\n", deviceProp.maxThreadsPerMultiProcessor);
+	printf("\tMulti-processor count: %d\n", deviceProp.multiProcessorCount);
+	printf("\tThreads per multi-processor: %d\n", deviceProp.maxThreadsPerMultiProcessor);
+
+	printf("\n");
 }
 
 long long get_cycles()

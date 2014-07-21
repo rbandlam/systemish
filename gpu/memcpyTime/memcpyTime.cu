@@ -4,16 +4,22 @@ void gpu_run(int *h_A)
 {
 	int *d_A = NULL;
 	int err = cudaSuccess;
-	long long startCycles = 0, endCycles = 0;
+	long long startCycles = 0, endCycles = 0, totCycles = 0;
+	int i = 0;
 
 	err = cudaMalloc((void **) &d_A, NUM_PKTS * sizeof(int));
 	CPE(err != cudaSuccess, "Failed to cudaMalloc\n", -1);
 
-	startCycles = get_cycles();
-	err = cudaMemcpy(d_A, h_A, NUM_PKTS * sizeof(int), cudaMemcpyHostToDevice);
-	endCycles = get_cycles();
+	for(i = 0; i < ITERS; i ++) {
+		startCycles = get_cycles();
+		err = cudaMemcpy(d_A, h_A, NUM_PKTS * sizeof(int), cudaMemcpyHostToDevice);
+		endCycles = get_cycles();
+		totCycles += (endCycles - startCycles);
+	}
 
-	printf("Cycles = %lld\n", endCycles - startCycles);
+	printf("Averages: cycles = %lld, nanoseconds = %f ns\n", totCycles / ITERS,
+		totCycles / (ITERS * 2.7));
+
 	CPE(err != cudaSuccess, "Failed to copy to device memory\n", -1);
 
 	err = cudaFree(d_A);

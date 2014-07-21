@@ -2,7 +2,8 @@
 #include <cuda_runtime.h>
 #include <time.h>
 
-#define NUM_PKTS 16 * 1024
+#define NUM_PKTS 16		// 1 cacheline
+#define ITERS 10000
 
 void printDeviceProperties();
 long long get_cycles();
