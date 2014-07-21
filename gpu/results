@@ -19,3 +19,10 @@ xia-router2: .042 s => 761.92 M random accesses per second
 	Does better gencode (arch/code pairs) help? Doesn't seem to..
 	GTX-750 has compute 5.0, but nvcc-5.5 supports only up to 3.5.
 
+
+* Memcpy latency:
+	Latency on xia-router2: 4.8 us for host-to-device memcpy. Cmon, you 
+	can do RDMA in less than that :).
+
+	Traditional latency is ~ 10 microseconds: 
+		https://www.princeton.edu/~dlustig/dlustig_HPCA13.pdf

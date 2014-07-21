@@ -27,3 +27,14 @@ long long get_cycles()
 	val = (val << 32) | low;
 	return val;
 }
+
+// Convenience function for checking CUDA runtime API results
+// can be wrapped around any runtime API call.
+cudaError_t checkCuda(cudaError_t result)
+{
+	if (result != cudaSuccess) {
+		fprintf(stderr, "CUDA Runtime Error: %sn", cudaGetErrorString(result));
+		assert(result == cudaSuccess);
+	}
+	return result;
+}
