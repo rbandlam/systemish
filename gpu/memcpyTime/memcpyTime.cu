@@ -1,5 +1,15 @@
 #include "common.h"
 
+__global__ void
+vectorAdd(int *A, int N)
+{
+	int i = blockDim.x * blockIdx.x + threadIdx.x;
+
+	if (i < N) {
+		A[i] *= A[i];
+	}
+}
+
 void gpu_run(int *h_A)
 {
 	int *d_A = NULL;
@@ -10,18 +20,52 @@ void gpu_run(int *h_A)
 	err = cudaMalloc((void **) &d_A, NUM_PKTS * sizeof(int));
 	CPE(err != cudaSuccess, "Failed to cudaMalloc\n", -1);
 
+	// Measure host-to-device memcpy latency
 	for(i = 0; i < ITERS; i ++) {
 		startCycles = get_cycles();
 		err = cudaMemcpy(d_A, h_A, NUM_PKTS * sizeof(int), cudaMemcpyHostToDevice);
 		endCycles = get_cycles();
 		totCycles += (endCycles - startCycles);
+		CPE(err != cudaSuccess, "Failed to copy to device memory\n", -1);
 	}
 
-	printf("Averages: cycles = %lld, nanoseconds = %f ns\n", totCycles / ITERS,
+	printf("memcpy host to device stats:\n");
+	printf("\tcycles = %lld, nanoseconds = %f ns\n", totCycles / ITERS,
 		totCycles / (ITERS * 2.7));
 
-	CPE(err != cudaSuccess, "Failed to copy to device memory\n", -1);
+	// Measure kernel launch execution time 
+	int threadsPerBlock = 256;
+	int blocksPerGrid = (NUM_PKTS + threadsPerBlock - 1) / threadsPerBlock;
 
+	totCycles = 0;
+	for(i = 0; i < ITERS; i ++) {
+		startCycles = get_cycles();
+		vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A, NUM_PKTS);
+		cudaDeviceSynchronize();
+		endCycles = get_cycles();
+		totCycles += (endCycles - startCycles);
+		
+		err = cudaGetLastError();
+		CPE(err != cudaSuccess, "Failed to launch vectorAdd kernel\n", -1);
+	}
+
+	printf("kernel launch stats:\n");
+	printf("\tcycles = %lld, nanoseconds = %f ns\n", totCycles / ITERS,
+		totCycles / (ITERS * 2.7));
+
+	// Measure device-to-host memcpy latency
+	totCycles = 0;
+	for(i = 0; i < ITERS; i ++) {
+		startCycles = get_cycles();
+		err = cudaMemcpy(h_A, d_A, NUM_PKTS * sizeof(int), cudaMemcpyDeviceToHost);
+		endCycles = get_cycles();
+		totCycles += (endCycles - startCycles);
+		CPE(err != cudaSuccess, "Failed to copy C from device to host\n", -1);
+	}
+
+	printf("memcpy device to host stats:\n");
+	printf("\tcycles = %lld, nanoseconds = %f ns\n", totCycles / ITERS,
+		totCycles / (ITERS * 2.7));
 	err = cudaFree(d_A);
 	CPE(err != cudaSuccess, "Failed to cudaFree\n", -1);
 }
