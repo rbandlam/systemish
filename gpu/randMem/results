@@ -1,4 +1,4 @@
-Kernel execution time (excluding copy to and from) to measure random
+* Kernel execution time (excluding copy to and from) to measure random
 memory access performance
 
 Test params:
@@ -9,3 +9,7 @@ Test params:
 Susitna: .024 s => 1,333 M random accesses per second
 xia-router2: .042 s => 761.92 M random accesses per second
 
+
+* Memory controllers:
+	xia-router2: GTX 570 Ti: 2 64-bit memory controllers
+	susitna: Tesla K20C: 6 64-bit memory controllers
