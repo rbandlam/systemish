@@ -1,0 +1,11 @@
+Kernel execution time (excluding copy to and from) to measure random
+memory access performance
+
+Test params:
+	NUM_PKTS = 8 * 1024 * 1024
+	DEPTH = 8
+	Random accesses per second = 1,333 M
+
+Susitna: .024 s => 1,333 M random accesses per second
+xia-router2: .042 s => 761.92 M random accesses per second
+
