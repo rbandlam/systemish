@@ -26,11 +26,16 @@ void gpu_run(int *h_A)
 		err = cudaMemcpy(d_A, h_A, NUM_PKTS * sizeof(int), cudaMemcpyHostToDevice);
 		endCycles = get_cycles();
 		totCycles += (endCycles - startCycles);
+
+		if(i > ITERS / 2 && i < (ITERS / 2 + 10)) {
+			printf("%d: cudaMemcpy (h2d) time: %f\n", i, (endCycles - startCycles) / 2.7);
+		}
+
 		CPE(err != cudaSuccess, "Failed to copy to device memory\n", -1);
 	}
 
 	printf("memcpy host to device stats:\n");
-	printf("\tcycles = %lld, nanoseconds = %f ns\n", totCycles / ITERS,
+	printf("\tcycles = %lld, nanoseconds = %f ns\n\n", totCycles / ITERS,
 		totCycles / (ITERS * 2.7));
 
 	// Measure kernel launch execution time 
@@ -44,13 +49,17 @@ void gpu_run(int *h_A)
 		cudaDeviceSynchronize();
 		endCycles = get_cycles();
 		totCycles += (endCycles - startCycles);
+
+		if(i > ITERS / 2 && i < (ITERS / 2 + 10)) {
+			printf("%d: kernel launch time: %f\n", i, (endCycles - startCycles) / 2.7);
+		}
 		
 		err = cudaGetLastError();
 		CPE(err != cudaSuccess, "Failed to launch vectorAdd kernel\n", -1);
 	}
 
 	printf("kernel launch stats:\n");
-	printf("\tcycles = %lld, nanoseconds = %f ns\n", totCycles / ITERS,
+	printf("\tcycles = %lld, nanoseconds = %f ns\n\n", totCycles / ITERS,
 		totCycles / (ITERS * 2.7));
 
 	// Measure device-to-host memcpy latency
@@ -60,11 +69,16 @@ void gpu_run(int *h_A)
 		err = cudaMemcpy(h_A, d_A, NUM_PKTS * sizeof(int), cudaMemcpyDeviceToHost);
 		endCycles = get_cycles();
 		totCycles += (endCycles - startCycles);
+
+		if(i > ITERS / 2 && i < (ITERS / 2 + 10)) {
+			printf("%d: cudaMemcpy (d2h) time: %f\n", i, (endCycles - startCycles) / 2.7);
+		}
+
 		CPE(err != cudaSuccess, "Failed to copy C from device to host\n", -1);
 	}
 
 	printf("memcpy device to host stats:\n");
-	printf("\tcycles = %lld, nanoseconds = %f ns\n", totCycles / ITERS,
+	printf("\tcycles = %lld, nanoseconds = %f ns\n\n", totCycles / ITERS,
 		totCycles / (ITERS * 2.7));
 	err = cudaFree(d_A);
 	CPE(err != cudaSuccess, "Failed to cudaFree\n", -1);
