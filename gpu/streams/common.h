@@ -3,7 +3,7 @@
 #include <time.h>
 #include <assert.h>
 
-#define NUM_PKTS (1024 * 1024)		// 1 cacheline
+#define NUM_PKTS 16		// 1 cacheline
 #define ITERS 10000
 
 void printDeviceProperties();
