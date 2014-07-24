@@ -1,14 +1,8 @@
-# Script to initialize DPDK on APT. Run as su
+# Script to initialize DPDK on APT. Run as root.
 
 ESC_SEQ="\x1b["
 COL_RED=$ESC_SEQ"31;01m"
 COL_RESET=$ESC_SEQ"39;49;00m"
-
-if [[ $EUID -ne 0 ]]; then
-	echo -e "$COL_RED This script must be run as root $COL_RESET"
-	exit 1
-fi
-
 
 RTE_SDK=/users/akalia/dpdk-1.5.0r0/
 RTE_TARGET=x86_64-default-linuxapp-gcc
