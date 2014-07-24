@@ -7,6 +7,13 @@ COL_RESET=$ESC_SEQ"39;49;00m"
 RTE_SDK=/users/akalia/dpdk-1.5.0r0/
 RTE_TARGET=x86_64-default-linuxapp-gcc
 
+# Create hugepage mount
+echo -e "$COL_RED Creating /mnt/huge $COL_RESET"
+umount /mnt/huge
+rm -rf /mnt/huge
+mkdir /mnt/huge
+mount -t hugetlbfs nodev /mnt/huge
+
 # Install uio modules
 modprobe uio
 insmod $RTE_SDK/$RTE_TARGET/kmod/igb_uio.ko
@@ -19,8 +26,8 @@ echo -e "$COL_RED Done creating hugepages. Status: $COL_RESET"
 cat /sys/devices/system/node/*/meminfo | grep Huge
 
 # Bind eth2 and eth3 to igb_uio
-echo -e "$COL_RED Bringing eth2 and eth3 down: $COL_RESET"
-ifconfig eth2 down
+echo -e "$COL_RED Bringing eth1 and eth3 down: $COL_RESET"
+ifconfig eth1 down
 ifconfig eth3 down
 echo -e "$COL_RED Binding ixgbe to igb_uio: $COL_RESET"
 $RTE_SDK/tools/pci_unbind.py --bind=igb_uio 03:00.0
