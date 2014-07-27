@@ -25,7 +25,7 @@ void gpu_run(int *h_A)
 	// Full execution measurements
 	long long start_cycles = 0, end_cycles = 0, tot_cycles = 0;
 
-	int i = 0;
+	int i = 0, j = 0;
 
 	int threadsPerBlock = 256;
 	int blocksPerGrid = (NUM_PKTS + threadsPerBlock - 1) / threadsPerBlock;
@@ -40,6 +40,11 @@ void gpu_run(int *h_A)
 	for(i = 0; i < ITERS; i ++) {
 		start_cycles = get_cycles();
 		
+		// Initialize h_A
+		for(j = 0; j < NUM_PKTS; j ++) {
+			h_A[j] = (i & 0xff) + j;
+		}
+
 		// Stage 1: host to device memcpy
 		start_cycles_h2d = get_cycles();
 		cudaMemcpyAsync(d_A, h_A, NUM_PKTS * sizeof(int), cudaMemcpyHostToDevice, stream_1);
@@ -57,6 +62,15 @@ void gpu_run(int *h_A)
 
 		// Complete full execution: the time for this is not included in per-stage measurement
 		cudaStreamSynchronize(stream_1);
+
+		// Verify kernel's result
+		for(j = 0; j < NUM_PKTS; j ++) {
+			int kernel_inp = (i & 0xff) + j;
+			if(h_A[j] != kernel_inp * kernel_inp) {
+				fprintf(stderr, "Kernel output mismatch error\n");
+				exit(-1);
+			}
+		}
 
 		end_cycles = get_cycles();
 
