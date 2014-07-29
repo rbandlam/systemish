@@ -251,16 +251,16 @@ ls_mnt_huge()
 ##### from DPDK/tools/setup.sh
 
 
-export RTE_SDK=`readlink -f $(dirname ${BASH_SOURCE[0]})/../../DPDK`
+export RTE_SDK=/home/akalia/dpdk-1.5.0r0/
 export RTE_TARGET=x86_64-default-linuxapp-gcc
 
 pushd "$RTE_SDK"; setup_target; popd
 
-#if [ "$HOSTNAME" == "server" ]; then
+if [ "$HOSTNAME" == "server" ]; then
 	set_numa_pages 8192 8192	# 32 GiB
-#else
-#	set_numa_pages 2048 2048	# 8 GiB
-#fi
+else
+	set_numa_pages 2048 2048	# 8 GiB
+fi
 load_igb_uio_module
 
 grep_meminfo

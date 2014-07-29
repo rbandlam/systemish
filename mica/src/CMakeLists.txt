@@ -61,7 +61,7 @@ set(LIBRARIES ${LIBRARIES} rt crypto perf_count m pthread)
 #set(LIBRARIES ${LIBRARIES} tcmalloc_minimal)
 
 # DPDK
-set(RTE_SDK ${CMAKE_CURRENT_SOURCE_DIR}/../../DPDK)
+set(RTE_SDK /home/akalia/dpdk-1.5.0r0/)
 set(RTE_TARGET x86_64-default-linuxapp-gcc)
 add_definitions(-DUSE_DPDK)
 add_definitions(-isystem ${RTE_SDK}/${RTE_TARGET}/include -include rte_config.h)
