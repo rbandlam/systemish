@@ -1,7 +1,9 @@
 #include <stdio.h>
-#include <cuda_runtime.h>
+#include <pthread.h>
 #include <time.h>
 #include <assert.h>
+
+#include <cuda_runtime.h>
 
 #define NUM_PKTS 16		// 1 cacheline
 #define ITERS 10000

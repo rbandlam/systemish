@@ -1,5 +1,11 @@
 #include "common.h"
 
+#define NUM_THREADS 4
+
+int *h_A[NUM_THREADS];
+int tid[NUM_THREADS];
+pthread_t thread[NUM_THREADS];
+
 __global__ void
 vectorAdd(int *A, int N)
 {
@@ -10,9 +16,12 @@ vectorAdd(int *A, int N)
 	}
 }
 
-void gpu_run(int *h_A)
+void *gpu_run(void *ptr)
 {
-	cudaStream_t stream_1;
+	int tid = *((int *) ptr);
+	printf("My tid = %d\n", tid);
+
+	cudaStream_t my_stream;
 		
 	int *d_A = NULL;
 	int err = cudaSuccess;
@@ -30,7 +39,7 @@ void gpu_run(int *h_A)
 	int threadsPerBlock = 256;
 	int blocksPerGrid = (NUM_PKTS + threadsPerBlock - 1) / threadsPerBlock;
 
-	err = cudaStreamCreate(&stream_1);
+	err = cudaStreamCreate(&my_stream);
 	CPE(err != cudaSuccess, "Failed to create cudaStream\n", -1);
 
 	err = cudaMalloc((void **) &d_A, NUM_PKTS * sizeof(int));
@@ -42,31 +51,31 @@ void gpu_run(int *h_A)
 		
 		// Initialize h_A
 		for(j = 0; j < NUM_PKTS; j ++) {
-			h_A[j] = (i & 0xff) + j;
+			h_A[tid][j] = (i & 0xff) + j;
 		}
 
 		// Stage 1: host to device memcpy
 		start_cycles_h2d = get_cycles();
-		cudaMemcpyAsync(d_A, h_A, NUM_PKTS * sizeof(int), cudaMemcpyHostToDevice, stream_1);
+		cudaMemcpyAsync(d_A, h_A[tid], NUM_PKTS * sizeof(int), cudaMemcpyHostToDevice, my_stream);
 		end_cycles_h2d = get_cycles();
 
 		// Stage 2: kernel execution
 		start_cycles_kernel = get_cycles();
-		vectorAdd<<<blocksPerGrid, threadsPerBlock, 0, stream_1>>>(d_A, NUM_PKTS);
+		vectorAdd<<<blocksPerGrid, threadsPerBlock, 0, my_stream>>>(d_A, NUM_PKTS);
 		end_cycles_kernel = get_cycles();
 
 		// Stage 2: device to host memcpy
 		start_cycles_d2h = get_cycles();
-		cudaMemcpyAsync(h_A, d_A, NUM_PKTS * sizeof(int), cudaMemcpyDeviceToHost, stream_1);
+		cudaMemcpyAsync(h_A[tid], d_A, NUM_PKTS * sizeof(int), cudaMemcpyDeviceToHost, my_stream);
 		end_cycles_d2h = get_cycles();
 
 		// Complete full execution: the time for this is not included in per-stage measurement
-		cudaStreamSynchronize(stream_1);
+		cudaStreamSynchronize(my_stream);
 
 		// Verify kernel's result
 		for(j = 0; j < NUM_PKTS; j ++) {
 			int kernel_inp = (i & 0xff) + j;
-			if(h_A[j] != kernel_inp * kernel_inp) {
+			if(h_A[tid][j] != kernel_inp * kernel_inp) {
 				fprintf(stderr, "Kernel output mismatch error\n");
 				exit(-1);
 			}
@@ -80,7 +89,9 @@ void gpu_run(int *h_A)
 		tot_cycles += (end_cycles - start_cycles);
 
 		if(rand() % 100 == 0) {
-			printf("%d | h2d = %d ns, kernel = %d ns, d2h = %d ns, full = %d ns\n", i, 
+			printf("Thread %d, iter %d | "
+				"h2d = %d ns, kernel = %d ns, d2h = %d ns, full = %d ns\n",
+				tid, i, 
 				(int) ((end_cycles_h2d - start_cycles_h2d) / 2.7),
 				(int) ((end_cycles_kernel - start_cycles_kernel) / 2.7),
 				(int) ((end_cycles_d2h - start_cycles_d2h) / 2.7),
@@ -94,7 +105,8 @@ void gpu_run(int *h_A)
 	cudaFree(d_A);
 
 	printf("\nFull execution stats:\n");
-	printf("\th2d = %d ns, kernel = %d ns, d2h = %d ns, full execution = %d ns\n", 
+	printf("\tThread %d: h2d = %d ns, kernel = %d ns, d2h = %d ns, full execution = %d ns\n",
+		tid,
 		(int) (tot_cycles_h2d / (2.7 * ITERS)),
 		(int) (tot_cycles_kernel / (2.7 * ITERS)),
 		(int) (tot_cycles_d2h / (2.7 * ITERS)), 
@@ -104,34 +116,44 @@ void gpu_run(int *h_A)
 	printf("\nSynchronization time = %d ns\n", 
 		(int) ((tot_cycles - total_busy_cycles) / (2.7 * ITERS)));
 
+	return 0;
 }
 
 int main(void)
 {
-	int *h_A;
 	int err = cudaSuccess;
-
 	printDeviceProperties();
 
-	// Allocate host vectors
-	err = cudaMallocHost((void **) &h_A, NUM_PKTS * sizeof(int));
-	CPE(err != cudaSuccess, "Could not allocate pinned memory\n", -1);
+	// Allocate host vectors in pinned memory
+	for(int thread_i = 0; thread_i < NUM_THREADS; thread_i ++) {
+		err = cudaMallocHost((void **) &h_A[thread_i], NUM_PKTS * sizeof(int));
+		CPE(err != cudaSuccess, "Could not allocate pinned memory\n", -1);
 
-	// Verify that allocations succeeded
-	if (h_A == NULL) {
-		fprintf(stderr, "Failed to allocate host vectors!\n");
-		exit(EXIT_FAILURE);
+		// Verify that allocations succeeded
+		if (h_A[thread_i] == NULL) {
+			fprintf(stderr, "Failed to allocate host vectors!\n");
+			exit(EXIT_FAILURE);
+		}
+
+		// Initialize the host input vectors
+		for(int j = 0; j < NUM_PKTS; j++)	{
+			h_A[thread_i][j] = thread_i + j;
+		}
 	}
 
-	// Initialize the host input vectors
-	for (int i = 0; i < NUM_PKTS; ++i)	{
-		h_A[i] = i;
+	for(int thread_i = 0; thread_i < NUM_THREADS; thread_i ++) {
+		tid[thread_i] = thread_i;
+		pthread_create(&thread[thread_i], NULL, gpu_run, &tid[thread_i]);
 	}
 
-	gpu_run(h_A);
-	
+	for(int thread_i = 0; thread_i < NUM_THREADS; thread_i ++) {
+		pthread_join(thread[thread_i], NULL);
+	}	
+
 	// Free pinned host memory
-	cudaFreeHost(h_A);
+	for(int thread_i = 0; thread_i < NUM_THREADS; thread_i ++) {
+		cudaFreeHost(h_A[thread_i]);
+	}
 
 	// Reset the device and exit
 	err = cudaDeviceReset();
