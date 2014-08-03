@@ -39,15 +39,15 @@ for i in `seq 0 7`; do
 done
 
 echo -e "$COL_RED Binding ports to igb_uio: $COL_RESET"
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 02:00.0
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 02:00.1
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 05:00.0
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 05:00.1
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 42:00.0
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 42:00.1
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 43:00.0
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 43:00.1
+$RTE_SDK/tools/pci_unbind.py --bind=igb_uio 02:00.0
+$RTE_SDK/tools/pci_unbind.py --bind=igb_uio 02:00.1
+$RTE_SDK/tools/pci_unbind.py --bind=igb_uio 05:00.0
+$RTE_SDK/tools/pci_unbind.py --bind=igb_uio 05:00.1
+$RTE_SDK/tools/pci_unbind.py --bind=igb_uio 42:00.0
+$RTE_SDK/tools/pci_unbind.py --bind=igb_uio 42:00.1
+$RTE_SDK/tools/pci_unbind.py --bind=igb_uio 43:00.0
+$RTE_SDK/tools/pci_unbind.py --bind=igb_uio 43:00.1
 echo -e "$COL_RED Done binding ixgbe to igb_uio. Status: $COL_RESET"
 
-$RTE_SDK/tools/dpdk_nic_bind.py --status
+$RTE_SDK/tools/pci_unbind.py --status
 

@@ -5,5 +5,5 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SHM_ID 3006
+#define SHM_ID 1
 
