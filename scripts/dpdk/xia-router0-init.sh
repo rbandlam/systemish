@@ -4,8 +4,8 @@ ESC_SEQ="\x1b["
 COL_RED=$ESC_SEQ"31;01m"
 COL_RESET=$ESC_SEQ"39;49;00m"
 
-RTE_SDK=/home/akalia/dpdk-1.7.0/
-RTE_TARGET=x86_64-native-linuxapp-gcc
+RTE_SDK=/home/akalia/dpdk-1.5.0r0/
+RTE_TARGET=x86_64-default-linuxapp-gcc
 
 # Increase shmmax and shmall parameters
 echo -e "$COL_RED Increasing shmmax and shmall $COL_RESET"

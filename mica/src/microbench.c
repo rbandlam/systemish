@@ -372,7 +372,7 @@ benchmark(const concurrency_mode_t concurrency_mode, double zipf_theta, double m
     uint8_t *values = (uint8_t *)mehcached_shm_malloc_striped(value_length * num_items * 2);
     assert(values);
 
-    uint64_t *op_count = (uint64_t *)malloc(sizeof(uint64_t) * max_num_operatios_per_thread);
+    uint64_t *op_count = (uint64_t *)malloc(sizeof(uint64_t) * num_threads);
     assert(op_count);
     uint8_t **op_types = (uint8_t **)malloc(sizeof(uint8_t *) * max_num_operatios_per_thread);
     assert(op_types);
