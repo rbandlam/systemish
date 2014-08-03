@@ -7,6 +7,12 @@ COL_RESET=$ESC_SEQ"39;49;00m"
 RTE_SDK=/home/akalia/dpdk-1.7.0/
 RTE_TARGET=x86_64-native-linuxapp-gcc
 
+# Increase shmmax and shmall parameters
+echo -e "$COL_RED Increasing shmmax and shmall $COL_RESET"
+sudo sysctl -w kernel.shmmax=2147483648     # Bytes
+sudo sysctl -w kernel.shmall=2147483648     # Pages
+sudo sysctl -p /etc/sysctl.conf
+
 # Create hugepage mount
 echo -e "$COL_RED Creating /mnt/huge $COL_RESET"
 umount /mnt/huge
