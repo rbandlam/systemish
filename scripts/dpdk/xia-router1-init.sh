@@ -17,6 +17,7 @@ mount -t hugetlbfs nodev /mnt/huge
 # Install uio modules
 echo -e "$COL_RED Installing uio and igb_uio modules $COL_RESET"
 modprobe uio
+rmmod igb_uio
 insmod $RTE_SDK/$RTE_TARGET/kmod/igb_uio.ko
 
 # Create some hugepages
@@ -27,20 +28,16 @@ echo -e "$COL_RED Done creating hugepages. Status: $COL_RESET"
 cat /sys/devices/system/node/*/meminfo | grep Huge
 
 # Bind 10 GbE ports to igb_uio
-echo -e "$COL_RED Bringing xge0 through xge7 down: $COL_RESET"
-for i in `seq 0 7`; do
+echo -e "$COL_RED Bringing xge0 through xge3 down: $COL_RESET"
+for i in `seq 0 3`; do
 	ifconfig xge$i down
 done
 
 echo -e "$COL_RED Binding ports to igb_uio: $COL_RESET"
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 02:00.0
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 02:00.1
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 05:00.0
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 05:00.1
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 42:00.0
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 42:00.1
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 43:00.0
-$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 43:00.1
+$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 03:00.0
+$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 03:00.1
+$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 06:00.0
+$RTE_SDK/tools/dpdk_nic_bind.py --bind=igb_uio 06:00.1
 echo -e "$COL_RED Done binding ixgbe to igb_uio. Status: $COL_RESET"
 
 $RTE_SDK/tools/dpdk_nic_bind.py --status
