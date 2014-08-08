@@ -2,37 +2,37 @@
 
 int volatile *h_A, *h_B;
 int volatile *d_A, *d_B;
+int volatile *h_flag_1, *d_flag_1;
+int volatile *h_flag_2, *d_flag_2;
 
 pthread_t thread;
 
 __global__ void
-vectorAdd(volatile int *A, volatile int *B, int N)
+vectorAdd(volatile int *A, volatile int *B, volatile int *flag_1, volatile int *flag_2, int N)
 {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
+	int iter = 0;
 	
 	if(i < N) {
-		while(1) {
-			while(A[i] == 0) {
-				// do nothing
+		// Wait for CPU flag a finite number of times
+		for(iter = 0; iter < ITERS; iter ++) {
+			while(flag_1[0] == 0) {
+				// Wait for host flag to be raised
 			}
-			if(A[i] == 3185) {
-				B[i] = A[i] * A[i];
-				A[i] = 0;
-				break;
-			}
+
+			// Lower host flag
+			flag_1[0] = 0;
+
 			B[i] = A[i] * A[i];
-			A[i] = 0;
+
+			// Raise device flag
+			flag_2[0] = 1;
 		}
 	}
 }
 
 void *gpu_run(void *ptr)
 {
-	// Per stage measurements
-	long long start_cycles_h2d = 0, start_cycles_kernel = 0, start_cycles_d2h = 0;
-	long long end_cycles_h2d = 0, end_cycles_kernel = 0, end_cycles_d2h = 0;
-	long long tot_cycles_h2d = 0, tot_cycles_kernel = 0, tot_cycles_d2h = 0;
-
 	// Full execution measurements
 	long long start_cycles = 0, end_cycles = 0, tot_cycles = 0;
 
@@ -42,76 +42,43 @@ void *gpu_run(void *ptr)
 
 	for(i = 0; i < ITERS; i ++) {
 		printf("Iteration %d\n", i);
+
 		start_cycles = get_cycles();
 		
-		// Stage 1: host to device latency
-		start_cycles_h2d = get_cycles();
 		for(j = 0; j < NUM_PKTS; j ++) {
 			h_A[j] = (i & 0xff) + j + 1;		// Always > 0
-
-			// In the last iteration, write something that helps the kernel to exit
-			if(i == ITERS - 1) {
-				h_A[j] = 3185;
-			}
-
 			assert(h_A[j] != 0);
 		}
-		end_cycles_h2d = get_cycles();
 
-		while(true) {
-			int all_zero = true;
-			for(j = 0; j < NUM_PKTS; j ++) {
-				if(h_A[j] != 0) {
-					all_zero = false;
-				}
-			}
+		// Raise host flag
+		h_flag_1[0] = 1;
 
-			// Check the output if the GPU kernel has processed all h_A
-			if(all_zero) {
-				break;
-			}
+		while(h_flag_2[0] == 0) {
+			// Wait for device flag
 		}
 
-		// Stage 2: device to host latency
-		start_cycles_d2h = get_cycles();
+		// Lower device flag
+		h_flag_2[0] = 0;
+
 		for(j = 0; j < NUM_PKTS; j ++) {
 			int kernel_inp = (i & 0xff) + j + 1;
 			// Verify for all iterations except the last iteration
-			if(i != (ITERS - 1) && h_B[j] != kernel_inp * kernel_inp) {
+			if(h_B[j] != kernel_inp * kernel_inp) {
 				fprintf(stderr, "Kernel output mismatch error\n");
 				exit(-1);
 			}
 		}
-		end_cycles_d2h = get_cycles();
 
 		end_cycles = get_cycles();
 
-		tot_cycles_h2d += (end_cycles_h2d - start_cycles_h2d);
-		tot_cycles_kernel += (end_cycles_kernel - start_cycles_kernel);
-		tot_cycles_d2h += (end_cycles_d2h - start_cycles_d2h);
 		tot_cycles += (end_cycles - start_cycles);
 
 		if(rand() % 100 == 0) {
-			printf("Iter %d | "
-				"h2d = %d ns, kernel = %d ns, d2h = %d ns, full = %d ns\n",
-				i, 
-				(int) ((end_cycles_h2d - start_cycles_h2d) / 2.7),
-				(int) ((end_cycles_kernel - start_cycles_kernel) / 2.7),
-				(int) ((end_cycles_d2h - start_cycles_d2h) / 2.7),
-				(int) ((end_cycles - start_cycles) / 2.7));
+			printf("Iter %d: %d ns\n", i, (int) ((end_cycles - start_cycles) / 2.7));
 		}
 	}
 
-	printf("\nFull execution stats:\n");
-	printf("\th2d = %d ns, kernel = %d ns, d2h = %d ns, full execution = %d ns\n",
-		(int) (tot_cycles_h2d / (2.7 * ITERS)),
-		(int) (tot_cycles_kernel / (2.7 * ITERS)),
-		(int) (tot_cycles_d2h / (2.7 * ITERS)), 
-		(int) (tot_cycles / (2.7 * ITERS)));
-
-	long long total_busy_cycles = tot_cycles_h2d + tot_cycles_kernel + tot_cycles_d2h;
-	printf("\nSynchronization time = %d ns\n", 
-		(int) ((tot_cycles - total_busy_cycles) / (2.7 * ITERS)));
+	printf("\nFull execution stats: %d ns\n", (int) (tot_cycles / (2.7 * ITERS)));
 
 	return 0;
 }
@@ -126,12 +93,21 @@ int main(void)
 	// Allocate host vectors as mapped memory
 	err = cudaHostAlloc(&h_A, NUM_PKTS * sizeof(int), cudaHostAllocMapped);
 	err = cudaHostAlloc(&h_B, NUM_PKTS * sizeof(int), cudaHostAllocMapped);
+
+	// Allocate the host and device flags (host memory versions)
+	err = cudaHostAlloc(&h_flag_1, sizeof(int), cudaHostAllocMapped);
+	err = cudaHostAlloc(&h_flag_2, sizeof(int), cudaHostAllocMapped);
+		
 	CPE(err != cudaSuccess, "Could not allocate managed memory\n", -1);
 
 	assert(h_A != NULL);
 	assert(h_B != NULL);
+	assert(h_flag_1 != NULL);
+	assert(h_flag_2 != NULL);
 
 	// Zero out the mapped memory vectors
+	h_flag_1[0] = 0;
+	h_flag_2[0] = 0;
 	for(int j = 0; j < NUM_PKTS; j++)	{
 		h_A[j] = 0;
 		h_B[j] = 0;
@@ -140,6 +116,8 @@ int main(void)
 	// Get device pointer for mapped memory
 	err = cudaHostGetDevicePointer((void **) &d_A, (void *) h_A, 0);
 	err = cudaHostGetDevicePointer((void **) &d_B, (void *) h_B, 0);
+	err = cudaHostGetDevicePointer((void **) &d_flag_1, (void *) h_flag_1, 0);
+	err = cudaHostGetDevicePointer((void **) &d_flag_2, (void *) h_flag_2, 0);
 
 	CPE(err != cudaSuccess, "Could not get device pointer for mapped memory\n", -1);
 
@@ -154,13 +132,11 @@ int main(void)
 	err = cudaStreamCreate(&my_stream);
 	CPE(err != cudaSuccess, "Failed to create cudaStream\n", -1);
 
-	vectorAdd<<<blocksPerGrid, threadsPerBlock, 0, my_stream>>>(d_A, d_B, NUM_PKTS);
+	vectorAdd<<<blocksPerGrid, threadsPerBlock, 0, my_stream>>>(d_A, d_B, d_flag_1, d_flag_2, NUM_PKTS);
 	cudaStreamQuery(my_stream);
 
 	printf("Waiting for CPU thread to finish\n");
 	pthread_join(thread, NULL);
-
-	
 
 	// Free allocated mapped memory
 	cudaFreeHost((void *) h_A);
