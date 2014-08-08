@@ -111,7 +111,7 @@ int main(void)
 	int err = cudaSuccess;
 	printDeviceProperties();
 
-	// Allocate host vectors in pinned memory
+	// Allocate host vectors in managed memory
 	for(int thread_i = 0; thread_i < NUM_THREADS; thread_i ++) {
 		err = cudaMallocManaged(&A[thread_i], NUM_PKTS * sizeof(int));
 		CPE(err != cudaSuccess, "Could not allocate managed memory\n", -1);

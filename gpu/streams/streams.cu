@@ -36,7 +36,7 @@ void *gpu_run(void *ptr)
 
 	int i = 0, j = 0;
 
-	int threadsPerBlock = 256;
+	int threadsPerBlock = 16;
 	int blocksPerGrid = (NUM_PKTS + threadsPerBlock - 1) / threadsPerBlock;
 
 	err = cudaStreamCreate(&my_stream);

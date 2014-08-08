@@ -41,17 +41,16 @@ void *gpu_run(void *ptr)
 	assert(NUM_PKTS < 64);			// Use one block
 
 	for(i = 0; i < ITERS; i ++) {
-		usleep(200000);
+		printf("Iteration %d\n", i);
 		start_cycles = get_cycles();
 		
 		// Stage 1: host to device latency
-		printf("Making h_A non-zero\n");
 		start_cycles_h2d = get_cycles();
 		for(j = 0; j < NUM_PKTS; j ++) {
 			h_A[j] = (i & 0xff) + j + 1;		// Always > 0
 
+			// In the last iteration, write something that helps the kernel to exit
 			if(i == ITERS - 1) {
-				printf("Last iter: using 3185\n");
 				h_A[j] = 3185;
 			}
 
@@ -64,8 +63,6 @@ void *gpu_run(void *ptr)
 			for(j = 0; j < NUM_PKTS; j ++) {
 				if(h_A[j] != 0) {
 					all_zero = false;
-					printf("Iter %d: waiting for element %d to become 0\n", i, j);
-					usleep(200000);
 				}
 			}
 
@@ -79,6 +76,7 @@ void *gpu_run(void *ptr)
 		start_cycles_d2h = get_cycles();
 		for(j = 0; j < NUM_PKTS; j ++) {
 			int kernel_inp = (i & 0xff) + j + 1;
+			// Verify for all iterations except the last iteration
 			if(i != (ITERS - 1) && h_B[j] != kernel_inp * kernel_inp) {
 				fprintf(stderr, "Kernel output mismatch error\n");
 				exit(-1);
