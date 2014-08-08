@@ -1,31 +1,33 @@
 #include "common.h"
 
-#define NUM_THREADS 1
+int volatile *h_A, *h_B;
+int volatile *d_A, *d_B;
 
-int *h_A[NUM_THREADS];
-int *d_A[NUM_THREADS];
-int tid[NUM_THREADS];
-pthread_t thread[NUM_THREADS];
+pthread_t thread;
 
 __global__ void
-vectorAdd(int *d_A, int N)
+vectorAdd(volatile int *A, volatile int *B, int N)
 {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
-
-	if (i < N) {
-		d_A[i] *= d_A[i];
+	
+	if(i < N) {
+		while(1) {
+			while(A[i] == 0) {
+				// do nothing
+			}
+			if(A[i] == 3185) {
+				B[i] = A[i] * A[i];
+				A[i] = 0;
+				break;
+			}
+			B[i] = A[i] * A[i];
+			A[i] = 0;
+		}
 	}
 }
 
 void *gpu_run(void *ptr)
 {
-	int tid = *((int *) ptr);
-	printf("My tid = %d\n", tid);
-
-	cudaStream_t my_stream;
-		
-	int err = cudaSuccess;
-
 	// Per stage measurements
 	long long start_cycles_h2d = 0, start_cycles_kernel = 0, start_cycles_d2h = 0;
 	long long end_cycles_h2d = 0, end_cycles_kernel = 0, end_cycles_d2h = 0;
@@ -36,35 +38,48 @@ void *gpu_run(void *ptr)
 
 	int i = 0, j = 0;
 
-	int threadsPerBlock = 16;
-	int blocksPerGrid = (NUM_PKTS + threadsPerBlock - 1) / threadsPerBlock;
-
-	err = cudaStreamCreate(&my_stream);
-	CPE(err != cudaSuccess, "Failed to create cudaStream\n", -1);
+	assert(NUM_PKTS < 64);			// Use one block
 
 	for(i = 0; i < ITERS; i ++) {
+		usleep(200000);
 		start_cycles = get_cycles();
 		
 		// Stage 1: host to device latency
+		printf("Making h_A non-zero\n");
 		start_cycles_h2d = get_cycles();
 		for(j = 0; j < NUM_PKTS; j ++) {
-			h_A[tid][j] = (i & 0xff) + j;
+			h_A[j] = (i & 0xff) + j + 1;		// Always > 0
+
+			if(i == ITERS - 1) {
+				printf("Last iter: using 3185\n");
+				h_A[j] = 3185;
+			}
+
+			assert(h_A[j] != 0);
 		}
 		end_cycles_h2d = get_cycles();
 
-		// Stage 2: kernel execution latency
-		start_cycles_kernel = get_cycles();
-		vectorAdd<<<blocksPerGrid, threadsPerBlock, 0, my_stream>>>(d_A[tid], NUM_PKTS);
-		end_cycles_kernel = get_cycles();
+		while(true) {
+			int all_zero = true;
+			for(j = 0; j < NUM_PKTS; j ++) {
+				if(h_A[j] != 0) {
+					all_zero = false;
+					printf("Iter %d: waiting for element %d to become 0\n", i, j);
+					usleep(200000);
+				}
+			}
 
-		// Complete full execution: the time for this is not included in per-stage measurement
-		cudaStreamSynchronize(my_stream);
+			// Check the output if the GPU kernel has processed all h_A
+			if(all_zero) {
+				break;
+			}
+		}
 
 		// Stage 2: device to host latency
 		start_cycles_d2h = get_cycles();
 		for(j = 0; j < NUM_PKTS; j ++) {
-			int kernel_inp = (i & 0xff) + j;
-			if(h_A[tid][j] != kernel_inp * kernel_inp) {
+			int kernel_inp = (i & 0xff) + j + 1;
+			if(i != (ITERS - 1) && h_B[j] != kernel_inp * kernel_inp) {
 				fprintf(stderr, "Kernel output mismatch error\n");
 				exit(-1);
 			}
@@ -79,22 +94,18 @@ void *gpu_run(void *ptr)
 		tot_cycles += (end_cycles - start_cycles);
 
 		if(rand() % 100 == 0) {
-			printf("Thread %d, iter %d | "
+			printf("Iter %d | "
 				"h2d = %d ns, kernel = %d ns, d2h = %d ns, full = %d ns\n",
-				tid, i, 
+				i, 
 				(int) ((end_cycles_h2d - start_cycles_h2d) / 2.7),
 				(int) ((end_cycles_kernel - start_cycles_kernel) / 2.7),
 				(int) ((end_cycles_d2h - start_cycles_d2h) / 2.7),
 				(int) ((end_cycles - start_cycles) / 2.7));
 		}
-		
-		err = cudaGetLastError();
-		CPE(err != cudaSuccess, "Fail!\n", -1);
 	}
 
 	printf("\nFull execution stats:\n");
-	printf("\tThread %d: h2d = %d ns, kernel = %d ns, d2h = %d ns, full execution = %d ns\n",
-		tid,
+	printf("\th2d = %d ns, kernel = %d ns, d2h = %d ns, full execution = %d ns\n",
 		(int) (tot_cycles_h2d / (2.7 * ITERS)),
 		(int) (tot_cycles_kernel / (2.7 * ITERS)),
 		(int) (tot_cycles_d2h / (2.7 * ITERS)), 
@@ -115,34 +126,47 @@ int main(void)
 	cudaSetDeviceFlags(cudaDeviceMapHost);
 
 	// Allocate host vectors as mapped memory
-	for(int thread_i = 0; thread_i < NUM_THREADS; thread_i ++) {
-		err = cudaHostAlloc(&h_A[thread_i], NUM_PKTS * sizeof(int), cudaHostAllocMapped);
-		CPE(err != cudaSuccess, "Could not allocate managed memory\n", -1);
+	err = cudaHostAlloc(&h_A, NUM_PKTS * sizeof(int), cudaHostAllocMapped);
+	err = cudaHostAlloc(&h_B, NUM_PKTS * sizeof(int), cudaHostAllocMapped);
+	CPE(err != cudaSuccess, "Could not allocate managed memory\n", -1);
 
-		assert(h_A[thread_i] != NULL);
+	assert(h_A != NULL);
+	assert(h_B != NULL);
 
-		// Initialize the managed memory vectors
-		for(int j = 0; j < NUM_PKTS; j++)	{
-			h_A[thread_i][j] = thread_i + j;
-		}
-
-		// Get device pointer for mapped memory
-		err = cudaHostGetDevicePointer((void **) &d_A[thread_i], (void *) h_A[thread_i], 0);
+	// Zero out the mapped memory vectors
+	for(int j = 0; j < NUM_PKTS; j++)	{
+		h_A[j] = 0;
+		h_B[j] = 0;
 	}
 
-	for(int thread_i = 0; thread_i < NUM_THREADS; thread_i ++) {
-		tid[thread_i] = thread_i;
-		pthread_create(&thread[thread_i], NULL, gpu_run, &tid[thread_i]);
-	}
+	// Get device pointer for mapped memory
+	err = cudaHostGetDevicePointer((void **) &d_A, (void *) h_A, 0);
+	err = cudaHostGetDevicePointer((void **) &d_B, (void *) h_B, 0);
 
-	for(int thread_i = 0; thread_i < NUM_THREADS; thread_i ++) {
-		pthread_join(thread[thread_i], NULL);
-	}	
+	CPE(err != cudaSuccess, "Could not get device pointer for mapped memory\n", -1);
 
-	// Free allocated managed memory
-	for(int thread_i = 0; thread_i < NUM_THREADS; thread_i ++) {
-		cudaFreeHost(h_A[thread_i]);
-	}
+	// Launch the CPU code
+	pthread_create(&thread, NULL, gpu_run, NULL);
+
+	// Launch the kernel once
+	printf("Launching CUDA kernel\n");
+	int threadsPerBlock = NUM_PKTS;
+	int blocksPerGrid = (NUM_PKTS + threadsPerBlock - 1) / threadsPerBlock;
+	cudaStream_t my_stream;
+	err = cudaStreamCreate(&my_stream);
+	CPE(err != cudaSuccess, "Failed to create cudaStream\n", -1);
+
+	vectorAdd<<<blocksPerGrid, threadsPerBlock, 0, my_stream>>>(d_A, d_B, NUM_PKTS);
+	cudaStreamQuery(my_stream);
+
+	printf("Waiting for CPU thread to finish\n");
+	pthread_join(thread, NULL);
+
+	
+
+	// Free allocated mapped memory
+	cudaFreeHost((void *) h_A);
+	cudaFreeHost((void *) h_B);
 
 	// Reset the device and exit
 	err = cudaDeviceReset();

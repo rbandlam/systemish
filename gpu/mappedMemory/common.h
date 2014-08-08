@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <time.h>
+#include <unistd.h>
 #include <assert.h>
 
 #include <cuda_runtime.h>
 
 #define NUM_PKTS 16		// 1 cacheline
-#define ITERS 10000
+#define ITERS 10
 
 void printDeviceProperties();
 long long get_cycles();
