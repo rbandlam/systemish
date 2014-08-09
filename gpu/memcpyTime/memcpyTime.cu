@@ -34,9 +34,12 @@ void gpu_run(int *h_A)
 		CPE(err != cudaSuccess, "Failed to copy to device memory\n", -1);
 	}
 
+	long long avgCycles = totCycles / ITERS;
+	double avgNanoSec = avgCycles / 2.7;
+	double avgGBps = (NUM_PKTS * sizeof(int)) / avgNanoSec;
 	printf("memcpy host to device stats:\n");
-	printf("\tcycles = %lld, nanoseconds = %f ns\n\n", totCycles / ITERS,
-		totCycles / (ITERS * 2.7));
+	printf("\tcycles = %lld, nanoseconds = %.2f ns, bandwidth = %.2f GB/s\n\n",
+		avgCycles, avgNanoSec, avgGBps);
 
 	// Measure kernel launch execution time 
 	int threadsPerBlock = 256;

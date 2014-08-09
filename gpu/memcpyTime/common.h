@@ -3,8 +3,8 @@
 #include <time.h>
 #include <assert.h>
 
-#define NUM_PKTS 16		// 1 cacheline
-#define ITERS 10000
+#define NUM_PKTS (1024 * 1024)		// For PCIe 1.0 x16 measurement
+#define ITERS 10
 
 void printDeviceProperties();
 long long get_cycles();
