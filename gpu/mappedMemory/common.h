@@ -7,7 +7,7 @@
 #include <cuda_runtime.h>
 
 #define NUM_PKTS 16		// 1 cacheline
-#define ITERS 50
+#define ITERS 1000
 
 void printDeviceProperties();
 long long get_cycles();
