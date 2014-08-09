@@ -38,3 +38,20 @@ cudaError_t checkCuda(cudaError_t result)
 	}
 	return result;
 }
+
+// Returns when all N elements in A are non-zero
+void waitForNonZero(volatile int *A, int N)
+{
+	int i;
+	while(1) {
+		int allNonZero = 1;
+		for(i = 0; i < N; i ++) {
+			if(A[i] == 0) {
+				allNonZero = 0;
+			}
+		}
+		if(allNonZero) {
+			return;
+		}
+	}
+}
