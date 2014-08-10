@@ -1,8 +1,8 @@
 #include "common.h"
 
-int volatile *h_A, *h_B;
-int volatile *d_A, *d_B;
-int volatile *h_flag, *d_flag;
+volatile int *h_A, *h_B;
+volatile int *d_A, *d_B;
+volatile int *h_flag, *d_flag;
 
 pthread_t thread;
 
