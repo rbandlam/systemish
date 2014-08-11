@@ -74,6 +74,8 @@ void *gpu_run(void *ptr)
 
 int main(int argc, char **argv)
 {
+	assert(argc == 2);
+
 	NUM_PKTS = atoi(argv[1]);
 	assert(NUM_PKTS > 0 && NUM_PKTS <= 256);
 
