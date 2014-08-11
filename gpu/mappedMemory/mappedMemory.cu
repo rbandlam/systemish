@@ -1,13 +1,14 @@
 #include "common.h"
 
-volatile int *h_A, *h_B;
-volatile int *d_A, *d_B;
-volatile int *h_flag, *d_flag;
+int volatile *h_A, *h_B;
+int volatile *d_A, *d_B;
+int volatile *h_flag, *d_flag;
+int volatile *d_log = NULL;			// Host does not access the log
 
 pthread_t thread;
 
 __global__ void
-vectorAdd(volatile int *A, volatile int *B, volatile int *flag, int N)
+vectorAdd(volatile int *A, volatile int *B, volatile int *flag, volatile int *log, int N)
 {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 	int iter = 0;
@@ -19,10 +20,10 @@ vectorAdd(volatile int *A, volatile int *B, volatile int *flag, int N)
 				// Wait for host flag to be raised
 			}
 
-			// Lower host flag
+			// Lower host flag to avoid reading it again
 			flag[0] = 0;
 
-			B[i] = A[i] * A[i];
+			B[i] = A[i] * 2;
 
 		}
 	}
@@ -47,6 +48,8 @@ void *gpu_run(void *ptr)
 			assert(h_A[j] != 0);
 		}
 
+		// XXX: Do we need a memory barrier here? h_A and h_flag are volatile
+
 		// Raise a flag for the GPU
 		h_flag[0] = 1;
 
@@ -54,9 +57,7 @@ void *gpu_run(void *ptr)
 		waitForNonZero(h_B, NUM_PKTS);
 
 		for(j = 0; j < NUM_PKTS; j ++) {
-			int kernel_inp = (i & 0xff) + j + 1;
-			// Verify for all iterations except the last iteration
-			if(h_B[j] != kernel_inp * kernel_inp) {
+			if(h_B[j] != h_A[j] * 2) {
 				fprintf(stderr, "Kernel output mismatch error\n");
 				exit(-1);
 			}
@@ -85,7 +86,7 @@ int main(void)
 	err = cudaHostAlloc(&h_A, NUM_PKTS * sizeof(int), cudaHostAllocMapped);
 	err = cudaHostAlloc(&h_B, NUM_PKTS * sizeof(int), cudaHostAllocMapped);
 
-	// Allocate the flag (host memory versions)
+	// Allocate the flag (host memory version)
 	err = cudaHostAlloc(&h_flag, sizeof(int), cudaHostAllocMapped);
 		
 	CPE(err != cudaSuccess, "Could not allocate managed memory\n", -1);
@@ -119,7 +120,7 @@ int main(void)
 	err = cudaStreamCreate(&my_stream);
 	CPE(err != cudaSuccess, "Failed to create cudaStream\n", -1);
 
-	vectorAdd<<<blocksPerGrid, threadsPerBlock, 0, my_stream>>>(d_A, d_B, d_flag, NUM_PKTS);
+	vectorAdd<<<blocksPerGrid, threadsPerBlock, 0, my_stream>>>(d_A, d_B, d_flag, d_log, NUM_PKTS);
 	cudaStreamQuery(my_stream);
 
 	printf("Waiting for CPU thread to finish\n");
