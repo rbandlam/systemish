@@ -16,9 +16,9 @@ set key font ',26'
 LABEL="Time ~ 2000 + (600 * [NUM_PKTS/32])"
 set label 10 at 6.5,9000 LABEL front left font 'Times, 20'
 
-var_blocksize = "time-var-blocksize.dat"
-fixed_blocksize = "time-fixed-blocksize.dat"
+time_rw = "time-read-write.dat"
+time_w = "time-write.dat"
 
 plot \
-var_blocksize using 1:2 title "Block size = number of pkts" w l lc rgb "#228B22" lt 1 lw 6,\
-fixed_blocksize using 1:2 title "Block size = 32" w l lc rgb "#8B0000" lt 1 lw 6,\
+time_rw using 1:2 title "Read + Write" w l lc rgb "#228B22" lt 1 lw 6,\
+time_w using 1:2 title "Write only" w l lc rgb "#228B22" lt 2 lw 6,\

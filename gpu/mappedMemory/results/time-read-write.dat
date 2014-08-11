@@ -1,4 +1,8 @@
 # Block size = NUM_PKTS
+# After sensing a raised flag, the kernel reads A[i] from mapped memory 
+# and updates B[i] = (A[i] * 2) + 1.
+#
+# This involves 2+ PCIe DMA reads and a PCIe DMA write per warp (of 32 packets).
 1 1939
 2 1920
 3 1940
