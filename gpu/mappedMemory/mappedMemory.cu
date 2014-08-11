@@ -4,6 +4,7 @@ int volatile *h_A, *h_B;
 int volatile *d_A, *d_B;
 int volatile *h_flag, *d_flag;
 int volatile *d_log = NULL;			// Host does not access the log
+int NUM_PKTS = -1;					// Passed as a command line argument
 
 pthread_t cpu_thread;				// CPU thread that talks to the GPU
 
@@ -71,8 +72,11 @@ void *gpu_run(void *ptr)
 	return 0;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
+	NUM_PKTS = atoi(argv[1]);
+	assert(NUM_PKTS > 0 && NUM_PKTS <= 256);
+
 	int err = cudaSuccess;
 	printDeviceProperties();
 
@@ -113,7 +117,9 @@ int main(void)
 	// Launch the kernel once
 	printf("Launching CUDA kernel\n");
 	int threadsPerBlock = NUM_PKTS;
+	assert(threadsPerBlock <= 256);
 	int blocksPerGrid = (NUM_PKTS + threadsPerBlock - 1) / threadsPerBlock;
+
 	cudaStream_t my_stream;
 	err = cudaStreamCreate(&my_stream);
 	CPE(err != cudaSuccess, "Failed to create cudaStream\n", -1);

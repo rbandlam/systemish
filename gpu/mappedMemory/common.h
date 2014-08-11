@@ -6,7 +6,6 @@
 
 #include <cuda_runtime.h>
 
-#define NUM_PKTS 16		// 1 cacheline
 #define LOG_CAP (1024 * 1024)		// 4 MB
 #define ITERS 1000
 
