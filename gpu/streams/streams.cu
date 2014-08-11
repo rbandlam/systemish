@@ -1,3 +1,5 @@
+// Example code for CUDA streams
+
 #include "common.h"
 
 #define NUM_THREADS 4
