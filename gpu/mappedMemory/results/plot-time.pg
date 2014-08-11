@@ -1,0 +1,20 @@
+set terminal postscript landscape font 'Times,28'
+set output "time.ps"
+
+set size ratio .5
+set grid
+
+set xtics 32
+set xlabel "Number of packets"
+set ylabel "Average time (ns)"
+
+set key above height 1 vertical maxrows 2
+set key noenhanced
+set key font ',26'
+
+var_blocksize = "time-var-blocksize.dat"
+fixed_blocksize = "time-fixed-blocksize.dat"
+
+plot \
+var_blocksize using 1:2 title "Block size = number of pkts" w l lc rgb "#228B22" lt 1 lw 6,\
+fixed_blocksize using 1:2 title "Block size = 32" w l lc rgb "#8B0000" lt 1 lw 6,\
