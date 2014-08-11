@@ -5,7 +5,7 @@ int volatile *d_A, *d_B;
 int volatile *h_flag, *d_flag;
 int volatile *d_log = NULL;			// Host does not access the log
 
-pthread_t thread;
+pthread_t cpu_thread;				// CPU thread that talks to the GPU
 
 __global__ void
 vectorAdd(volatile int *A, volatile int *B, volatile int *flag, volatile int *log, int N)
@@ -16,15 +16,11 @@ vectorAdd(volatile int *A, volatile int *B, volatile int *flag, volatile int *lo
 	if(i < N) {
 		// Wait for CPU flag a finite number of times
 		for(iter = 0; iter < ITERS; iter ++) {
-			while(flag[0] == 0) {
+			while(flag[0] == iter - 1) {
 				// Wait for host flag to be raised
 			}
 
-			// Lower host flag to avoid reading it again
-			flag[0] = 0;
-
 			B[i] = A[i] * 2;
-
 		}
 	}
 }
@@ -35,23 +31,23 @@ void *gpu_run(void *ptr)
 	// Full execution measurements
 	long long start_cycles = 0, end_cycles = 0, tot_cycles = 0;
 
-	int i = 0, j = 0;
+	int iter = 0, j = 0;
 
-	for(i = 0; i < ITERS; i ++) {
-		printf("Iteration %d\n", i);
+	for(iter = 0; iter < ITERS; iter ++) {
+		printf("Iteration %d\n", iter);
 		memset((char *) h_B, 0, NUM_PKTS * sizeof(int));
 
 		start_cycles = get_cycles();
 		
 		for(j = 0; j < NUM_PKTS; j ++) {
-			h_A[j] = (i & 0xff) + j + 1;		// Always > 0
+			h_A[j] = (iter & 0xff) + j + 1;		// Always > 0
 			assert(h_A[j] != 0);
 		}
 
 		// XXX: Do we need a memory barrier here? h_A and h_flag are volatile
 
 		// Raise a flag for the GPU
-		h_flag[0] = 1;
+		h_flag[0] = iter;
 
 		// Wait till the GPU makes all of h_B non-zero
 		waitForNonZero(h_B, NUM_PKTS);
@@ -67,7 +63,7 @@ void *gpu_run(void *ptr)
 
 		tot_cycles += (end_cycles - start_cycles);
 
-		printf("\tIter %d: %d ns\n", i, (int) ((end_cycles - start_cycles) / 2.7));
+		printf("\tIter %d: %d ns\n", iter, (int) ((end_cycles - start_cycles) / 2.7));
 	}
 
 	printf("\nFull execution stats: %d ns\n", (int) (tot_cycles / (2.7 * ITERS)));
@@ -95,8 +91,10 @@ int main(void)
 	assert(h_B != NULL);
 	assert(h_flag != NULL);
 
+	// The kernel expects that for iteration #i, i >= 0, the flag will be i
+	h_flag[0] = -1;
+
 	// Zero out the mapped memory vectors
-	h_flag[0] = 0;
 	for(int j = 0; j < NUM_PKTS; j++)	{
 		h_A[j] = 0;
 		h_B[j] = 0;
@@ -110,7 +108,7 @@ int main(void)
 	CPE(err != cudaSuccess, "Could not get device pointer for mapped memory\n", -1);
 
 	// Launch the CPU code
-	pthread_create(&thread, NULL, gpu_run, NULL);
+	pthread_create(&cpu_thread, NULL, gpu_run, NULL);
 
 	// Launch the kernel once
 	printf("Launching CUDA kernel\n");
@@ -124,7 +122,7 @@ int main(void)
 	cudaStreamQuery(my_stream);
 
 	printf("Waiting for CPU thread to finish\n");
-	pthread_join(thread, NULL);
+	pthread_join(cpu_thread, NULL);
 
 	// Free allocated mapped memory
 	cudaFreeHost((void *) h_A);
