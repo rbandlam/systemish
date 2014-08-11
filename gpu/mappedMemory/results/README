@@ -1,0 +1,6 @@
+Numbers based on the mappedMemory benchmark.
+
+The GPU reads NUM_PKTS integers from mapped memory, does some computation,
+and writes results back to mapped memory.
+
+The time taken for this exchange is measured.
