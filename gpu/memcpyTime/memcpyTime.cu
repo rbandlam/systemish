@@ -25,13 +25,15 @@ void gpu_run(int *h_A)
 		startCycles = get_cycles();
 		err = cudaMemcpy(d_A, h_A, NUM_PKTS * sizeof(int), cudaMemcpyHostToDevice);
 		endCycles = get_cycles();
-		totCycles += (endCycles - startCycles);
 
-		if(i > ITERS / 2 && i < (ITERS / 2 + 10)) {
+		// 1st transfer takes a very long time
+		if(i != 0) {
+			totCycles += (endCycles - startCycles);
+	
 			printf("%d: cudaMemcpy (h2d) time: %f\n", i, (endCycles - startCycles) / 2.7);
+	
+			CPE(err != cudaSuccess, "Failed to copy to device memory\n", -1);
 		}
-
-		CPE(err != cudaSuccess, "Failed to copy to device memory\n", -1);
 	}
 
 	long long avgCycles = totCycles / ITERS;
