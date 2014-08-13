@@ -40,23 +40,27 @@ cudaError_t checkCuda(cudaError_t result)
 }
 
 // Returns when all N elements in A are non-zero
-void waitForNonZero(volatile int *A, int N)
+void waitForNonZero(volatile int *A, int N, int tid)
 {
 	int i, turns = 0;
 	while(1) {
 		int allNonZero = 1;
+		int zeroAt = -1;
 		for(i = 0; i < N; i ++) {
 			if(A[i] == 0) {
 				allNonZero = 0;
+				zeroAt = i;
+				break;
 			}
 		}
+
 		if(allNonZero) {
 			return;
 		}
 
 		turns ++;
-		if(turns > 1000000) {
-			printf("Waiting for non-zero ...\n");
+		if(turns > 1000000000) {
+			printf("Thread %d: Waiting for non-zero at index %d\n", tid, zeroAt);
 			turns = 0;
 		}
 	}
