@@ -4,6 +4,18 @@
 
 long long ins_count;
 
+double your_slow_code()
+{
+	int i;
+	double tmp = 1.1;
+
+	for(i = 1; i < 100000000; i++) { 
+		tmp = (tmp + 100) / i;
+	}
+
+	return tmp;
+}
+
 void papi_start(void) 
 {
     int ins = PAPI_TOT_INS;
@@ -26,5 +38,9 @@ void papi_mark(void)
 int main(int c, char** args)
 {
 	papi_start();
+	double ans = your_slow_code();
 	papi_mark();
+
+	printf("Ans = %f\n", ans);
 }
+
