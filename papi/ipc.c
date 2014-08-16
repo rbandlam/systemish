@@ -32,7 +32,7 @@ int main()
 
 	your_slow_code();
 
-	if((retval = PAPI_ipc(&real_time, &proc_time, &ins, &ipc))<PAPI_OK) {    
+	if((retval = PAPI_ipc(&real_time, &proc_time, &ins, &ipc)) < PAPI_OK) {    
 		printf("retval: %d\n", retval);
 		exit(1);
 	}
@@ -50,9 +50,10 @@ int your_slow_code()
 	int i;
 	double tmp = 1.1;
 
-	for(i=1; i<2000; i++) { 
+	for(i = 1; i < 2000; i++) { 
 		tmp = (tmp + 100) / i;
 	}
+
 	return 0;
 }
 
