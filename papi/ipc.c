@@ -50,7 +50,7 @@ int your_slow_code()
 	int i;
 	double tmp = 1.1;
 
-	for(i = 1; i < 2000; i++) { 
+	for(i = 1; i < 100000000; i++) { 
 		tmp = (tmp + 100) / i;
 	}
 
