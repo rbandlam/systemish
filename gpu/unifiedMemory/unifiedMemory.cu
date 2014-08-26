@@ -2,17 +2,17 @@
 
 #define NUM_THREADS 1
 
-int *A[NUM_THREADS];
+int *A[NUM_THREADS], *B[NUM_THREADS];
 int tid[NUM_THREADS];
 pthread_t thread[NUM_THREADS];
 
 __global__ void
-vectorAdd(int *A, int N)
+vectorAdd(int *A, int *B, int N)
 {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 
 	if (i < N) {
-		A[i] *= A[i];
+		B[i] = A[i] * A[i];
 	}
 }
 
@@ -53,7 +53,7 @@ void *gpu_run(void *ptr)
 
 		// Stage 2: kernel execution latency
 		start_cycles_kernel = get_cycles();
-		vectorAdd<<<blocksPerGrid, threadsPerBlock, 0, my_stream>>>(A[tid], NUM_PKTS);
+		vectorAdd<<<blocksPerGrid, threadsPerBlock, 0, my_stream>>>(A[tid], B[tid], NUM_PKTS);
 		end_cycles_kernel = get_cycles();
 
 		// Complete full execution: the time for this is not included in per-stage measurement
@@ -63,7 +63,7 @@ void *gpu_run(void *ptr)
 		start_cycles_d2h = get_cycles();
 		for(j = 0; j < NUM_PKTS; j ++) {
 			int kernel_inp = (i & 0xff) + j;
-			if(A[tid][j] != kernel_inp * kernel_inp) {
+			if(B[tid][j] != kernel_inp * kernel_inp) {
 				fprintf(stderr, "Kernel output mismatch error\n");
 				exit(-1);
 			}
@@ -114,6 +114,7 @@ int main(void)
 	// Allocate host vectors in managed memory
 	for(int thread_i = 0; thread_i < NUM_THREADS; thread_i ++) {
 		err = cudaMallocManaged(&A[thread_i], NUM_PKTS * sizeof(int));
+		err = cudaMallocManaged(&B[thread_i], NUM_PKTS * sizeof(int));
 		CPE(err != cudaSuccess, "Could not allocate managed memory\n", -1);
 
 		assert(A[thread_i] != NULL);
@@ -121,6 +122,7 @@ int main(void)
 		// Initialize the managed memory vectors
 		for(int j = 0; j < NUM_PKTS; j++)	{
 			A[thread_i][j] = thread_i + j;
+			B[thread_i][j] = 0;
 		}
 	}
 
@@ -136,6 +138,7 @@ int main(void)
 	// Free allocated managed memory
 	for(int thread_i = 0; thread_i < NUM_THREADS; thread_i ++) {
 		cudaFree(A[thread_i]);
+		cudaFree(B[thread_i]);
 	}
 
 	// Reset the device and exit
