@@ -15,9 +15,7 @@ set key font 'Courier,26'
 
 haswell_rw = "haswell-time-read-write.dat"
 time_rw = "time-read-write.dat"
-time_w = "time-write.dat"
 
 plot \
 time_rw using 1:2 title "xia-r2 (pcie 2.0 x16, rw)" w l lc rgb "#228B22" lt 1 lw 4,\
-time_w using 1:2 title "xia-r2 (pcie 2.0 x16, w)" w l lc rgb "#228B22" lt 2 lw 4,\
 haswell_rw using 1:2 title "haswell (pcie 3.0 x16, rw)" w l lc rgb "#8B0000" lt 2 lw 4,\
