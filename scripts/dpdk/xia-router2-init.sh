@@ -9,8 +9,8 @@ RTE_TARGET=x86_64-default-linuxapp-gcc
 
 # Increase shmmax and shmall parameters
 echo -e "$COL_RED Increasing shmmax and shmall $COL_RESET"
-sudo sysctl -w kernel.shmmax=2147483648     # Bytes
-sudo sysctl -w kernel.shmall=2147483648     # Pages
+kernel.shmmax = 9223372036854775807
+kernel.shmall = 1152921504606846720
 sudo sysctl -p /etc/sysctl.conf
 
 # Create hugepage mount
@@ -27,8 +27,8 @@ insmod $RTE_SDK/$RTE_TARGET/kmod/igb_uio.ko
 
 # Create some hugepages
 echo -e "$COL_RED Creating 2048 hugepages on both sockets $COL_RESET"
-echo 2048 > /sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages
-echo 2048 > /sys/devices/system/node/node1/hugepages/hugepages-2048kB/nr_hugepages
+#echo 2048 > /sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages
+echo 4192 > /sys/devices/system/node/node1/hugepages/hugepages-2048kB/nr_hugepages
 echo -e "$COL_RED Done creating hugepages. Status: $COL_RESET"
 cat /sys/devices/system/node/*/meminfo | grep Huge
 
