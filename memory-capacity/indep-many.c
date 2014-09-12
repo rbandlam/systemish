@@ -6,8 +6,8 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
-#define LOG_CAP 268435456
-#define LOG_CAP_ 268435455
+#define LOG_CAP (128 * 1024 * 1024)
+#define LOG_CAP_ (LOG_CAP - 1)
 
 #define NUM_ACCESSES (32 * 1024 * 1024)
 
@@ -46,6 +46,7 @@ inline long long get_cycles()
 int main(int argc, char **argv)
 {
 	int i, sum = 0;
+	struct timespec start, end;
 	int tid = atoi(argv[1]);
 	init_ht_log(tid);
 	
@@ -57,15 +58,17 @@ int main(int argc, char **argv)
 	int iter = 0;
 	while(1) {
 		iter ++;
-		long long start_tsc = get_cycles();
+		
+		clock_gettime(CLOCK_REALTIME, &start);
 	
 		for(i = 0; i < NUM_ACCESSES; i ++) {
 			sum += ht_log[ind[i]];
 		}
+	
+		clock_gettime(CLOCK_REALTIME, &end);
+		double seconds = (double) (end.tv_nsec - start.tv_nsec) / 1000000000 + 
+			(end.tv_sec - start.tv_sec);
 		
-		long long end_tsc = get_cycles() + (sum & 3);
-
-		double seconds = (end_tsc - start_tsc) / (2.7 * 1000000000);
-		printf("TPUT %d = %f\n", tid, NUM_ACCESSES / seconds);
+		printf("TPUT %d = %f, sum = %d\n", tid, NUM_ACCESSES / seconds, sum);
 	}
 }
