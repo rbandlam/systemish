@@ -2,7 +2,7 @@
 #include <string.h>
 #include <libmemcached/memcached.h>
 
-#define APP_SERVER_NAME "128.110.96.80"
+#define APP_SERVER_NAME "128.2.211.34"
 
 int main(int argc, char **argv) 
 {

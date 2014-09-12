@@ -1,2 +1,2 @@
-To run a memcached server on a machine:
-	$memcached
+To run a memcached server on a machine and listen on all interfaces:
+	$memcached -l 0.0.0.0
