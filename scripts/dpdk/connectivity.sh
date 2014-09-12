@@ -1,5 +1,5 @@
 # This script checks the connectivity between xia-router2 and
-# xia-router0/1. The interface xgeN on xia-router2 should be 
+# xia-router0/1. The interface xgeN on xia-router2 *must* be 
 # connected to IP 10.0.N.1.
 
 function blue() {
