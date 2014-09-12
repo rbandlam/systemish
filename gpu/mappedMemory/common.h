@@ -6,7 +6,9 @@
 
 #include <cuda_runtime.h>
 
-#define LOG_CAP (1024 * 1024)		// 4 MB
+#define LOG_CAP 8192		// 4 KB
+#define LOG_STEP 16
+
 #define ITERS 1000
 
 void printDeviceProperties();
