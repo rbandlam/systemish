@@ -1,10 +1,11 @@
-// Measure the performance of a large number of independent memory accesses
+/** < Measure the random-access capacity of a processor */
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
 #include<string.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
+#include<sys/ipc.h>
+#include<sys/shm.h>
+#include<assert.h>
 
 #define LOG_CAP (128 * 1024 * 1024)
 #define LOG_CAP_ (LOG_CAP - 1)
@@ -17,7 +18,8 @@ struct timespec start, end;
 void init_ht_log(int tid)
 {
 	int i;
-	int shm_id = shmget(tid, LOG_CAP * sizeof(int), IPC_CREAT | 0666 | SHM_HUGETLB);
+	int shm_id = shmget(tid, 
+		LOG_CAP * sizeof(int), IPC_CREAT | 0666 | SHM_HUGETLB);
 	printf("Initializing %lu bytes\n", LOG_CAP * sizeof(int));
 	if(shm_id == -1) {
 		fprintf(stderr, "shmget Error! Failed to create array\n");
@@ -28,28 +30,22 @@ void init_ht_log(int tid)
 
 	srand(41);
 	for(i = 0; i < LOG_CAP; i++) {
-		ht_log[i] = rand() & 3;
+		ht_log[i] = i;
 	}
 	printf("Done initializing\n");
-}
-
-inline long long get_cycles()
-{
-	unsigned low, high;
-	unsigned long long val;
-	asm volatile ("rdtsc" : "=a" (low), "=d" (high));
-	val = high;
-	val = (val << 32) | low;
-	return val;
 }
 
 int main(int argc, char **argv)
 {
 	int i, sum = 0;
 	struct timespec start, end;
+
+	assert(argc == 2);
 	int tid = atoi(argv[1]);
+
 	init_ht_log(tid);
 	
+	/** < Create random indices into the log for independent access */
 	int *ind = (int *) malloc(NUM_ACCESSES * sizeof(int));
 	for(i = 0; i < NUM_ACCESSES; i++) {
 		ind[i] = rand() & LOG_CAP_;

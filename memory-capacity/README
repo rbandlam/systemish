@@ -1,9 +1,14 @@
-indep-many: measure the throughput of memory-access sled.
+rand-rate: Measure the random-access rate from a processor.
 
-Xeon:
+Results: 
+Xeon E5-2680:
 	1 core: 100M
 	16 cores: 16 x 64M
 
-i7:
+i7-4770:
 	1 core: 84M
 	8 cores: 8 x 22M
+
+***********************************************************
+
+rand-latency: Measure the latency of a random access
