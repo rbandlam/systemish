@@ -1,14 +1,19 @@
 rand-rate: Measure the random-access rate from a processor.
 
-Results: 
+Results:
+ 
 Xeon E5-2680:
-	1 core: 100M
-	16 cores: 16 x 64M
+	1 core: 100M/s
+	16 cores: 16 x 64M/s
 
 i7-4770:
-	1 core: 84M
-	8 cores: 8 x 22M
+	1 core: 84M/s
+	8 cores: 8 x 22M/s
 
 ***********************************************************
 
 rand-latency: Measure the latency of a random access
+
+Xeon E5-2680: 	90.5 ns
+i7-4770:		67.8 ns
+L5640:			84.0 ns
