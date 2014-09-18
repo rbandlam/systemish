@@ -10,7 +10,7 @@ function blue() {
 
 for i in `seq 0 7`; do
 	blue "Checking connectivity from xge$i"
-	for j in `seq 0 7`; do
+	for j in `seq $i $i`; do
 		blue "\tChecking connectivity for 10.0.$j.1"
 		ping -I xge$i 10.0.$j.1 &
 		sleep 2
