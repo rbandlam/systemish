@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 		for(j = 0; j < NUM_LONGS; j ++) {
 			A[j] = 0xffffffffffffffffL + i;
 		}
-		sum += CityHash64((char *) A, 4);
+		sum += CityHash64((char *) A, NUM_LONGS * sizeof(long long));
 	}
 
 	clock_gettime(CLOCK_REALTIME, &end);
