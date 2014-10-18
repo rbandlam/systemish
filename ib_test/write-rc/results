@@ -1,0 +1,4 @@
+Nome: ConnectX PCIe 1.0 x8
+
+16 byte reliable writes from 8 client machines: 2.5 Mops for 7 clients + 4.5 Mops for 1 client
+	= 22 Mops
